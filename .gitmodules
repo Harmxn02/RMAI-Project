@@ -1,0 +1,3 @@
+[submodule "code/LLM Validator"]
+	path = code/LLM Validator
+	url = https://github.com/Harmxn02/LLM-generated-HTML-code-validator-loop
