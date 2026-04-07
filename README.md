@@ -6,4 +6,4 @@ This repository contains the research proposal and the related code for the **IM
 
 ..., ..., ..., ... are provided in the accompanying **PDF document**
 
-Please refer to the file [`report/main.pdf`](report/main.pdf)
+Please refer to the file [`report/Onderzoeksvoorstel_HarmanSingh.pdf`](report/Onderzoeksvoorstel_HarmanSingh.pdf)
