@@ -6,6 +6,24 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
+% other packages, added by me
+\usepackage{minted} % remember to compile with -shell-escape flag (I changed it back because it was slow as fuck, but it needs to be like that in `settings.json' for `minted' to work)
+\usepackage[parfill]{parskip}
+
+\usepackage{color}
+\definecolor{customblue}{RGB}{7, 116, 183}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=red,
+	citecolor=customblue,
+	urlcolor=customblue,
+	filecolor=customblue,
+	anchorcolor=black,
+	menucolor=black,
+}
+
+
 
 \title{Research proposal: `Towards Perfect Code Generation: Iterative API-based Feedback Loops'}
 \shorttitle{Iterative API-based Feedback Loops}
@@ -18,9 +36,11 @@
 \maketitle
 
 \input{sections/Background.tex}
-\input{sections/LiteratureReview.tex}
+% \input{sections/LiteratureReview.tex} % does not have to be a seperate section, but just reference relevant literature
 \input{sections/ResearchQuestions.tex}
 \input{sections/ResearchMethods.tex}
+
+\input{sections/Appendix.tex}
 
 
 
