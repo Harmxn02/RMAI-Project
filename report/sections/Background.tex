@@ -11,4 +11,3 @@ Research shows that only a small number of samples can poison LLMs of any size~\
 We propose to use such APIs to create a guardrail for LLM outputs which consists of an iterative feedback loop that will continously find errors in the code and regenerate the code by passing the errors the API found in a `regeneration prompt'.
 
 In addition to this issue, there is also a need to evaluate the cost-effectiveness of the proposed guardrail. Such guardrails may allow smaller and cheaper LLMs to achieve the same level of output quality as larger models, which could lead to cost savings. Instead of using a large and expensive LLM to generate code, you could use a smaller and cheaper LLM and give it multiple chances to get the code right, which is possible due to such models being much cheaper to run.
-\newpage

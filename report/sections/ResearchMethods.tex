@@ -3,27 +3,46 @@
 
 \subsection{System Design}
 
-\textit{(short paragraph)}
+% \textit{(short paragraph)}
 
-Describe the guardrail at a high level \textemdash{} an iterative feedback loop consisting of three components: an LLM for code generation (local, through Ollama), the W3C Markup Validation Service as the external validator (running through a Docker container), and a reprompting mechanism (Python codebase). Mention that the loop has a configurable maximum number of iteration
+% Describe the guardrail at a high level \textemdash{} an iterative feedback loop consisting of three components: an LLM for code generation (local, through Ollama), the W3C Markup Validation Service as the external validator (running through a Docker container), and a reprompting mechanism (Python codebase). Mention that the loop has a configurable maximum number of iteration
+
+At a high level, the guardrail system is designed as an iterative feedback loop that integrates three core components:
+
+\begin{itemize}
+	\item \textbf{LLM for Code Generation:} We use Ollama to run local language models to generate HTML code based on a set of predefined prompts with varying levels of difficulty.
+	\item \textbf{Validation:} The code validation is performed using the W3C Markup Validation Service, which we run the from a Docker container, avoiding the risk of rate-limits if we were to use the public API.
+	\item \textbf{Reprompting Mechanism:} We have designed a Python pipeline that takes the validation results and constructs a new prompt for the LLM, which includes the original code and the specific errors and warnings identified by the validator, guiding the model to correct its mistakes in the next iteration.
+\end{itemize}
+
 
 \subsection{The Feedback Loop}
 
-\textit{(the core of the section \textemdash{} a paragraph + possibly a small diagram)}
+% \textit{(the core of the section \textemdash{} a paragraph + possibly a small diagram)}
 
-Walk through the process step by step: initial generation (using a random prompt from a predefined set) $\rightarrow$ validation $\rightarrow$ if errors are found, construct a regeneration prompt containing the incorrect code and the validation errors $\rightarrow$ regenerate $\rightarrow$ re-validate $\rightarrow$ repeat until either no errors remain or the iteration limit is reached. When the script ends you see a table of the results, showing the ERRORS, WARNINGS and INFOS counts before and after the guardrail process, with a delta (difference), and the number of iterations taken.
+% Walk through the process step by step: initial generation (using a random prompt from a predefined set) $\rightarrow$ validation $\rightarrow$ if errors are found, construct a regeneration prompt containing the incorrect code and the validation errors $\rightarrow$ regenerate $\rightarrow$ re-validate $\rightarrow$ repeat until either no errors remain or the iteration limit is reached. When the script ends you see a table of the results, showing the ERRORS, WARNINGS and INFOS counts before and after the guardrail process, with a delta (difference), and the number of iterations taken.
+
+We start the process by selecting a random prompt from a predefined set of HTML generation tasks. The LLM generates the code, which is then passed to the validator. If the validator identifies no errors or warnings, the process ends successfully. However, if there are issues, the system will first check if the maximum number of iterations has been reached. If is has, the process ends with a failure. If not, the system constructs a new prompt for the LLM that includes the original code and the specific errors and warnings reported by the validator. The LLM then is tasked to correct the code based on this feedback. This correction is then re-validated, and the loop continues until either the code is error-free or the iteration limit is reached. The process is visualised in Figure~\ref{fig:feedback-loop}. At the end of the process a summary table shows the counts of errors, warnings before and after the guardrail process. An example of a summary table is shown in Table~\ref{tab:validation-results}.
+
 
 \subsection{Models and Configuration}
 
-\textit{(short paragraph)}
+% \textit{(short paragraph)}
 
-Specificy which models will be tested (local models via Ollama vs. larger API-based models), and what the experiment variables are \textemdash{} i.e. model size and number of iterations. This sets up the comparison needed for RQ2.
+% Specificy which models will be tested (local models via Ollama vs. larger API-based models), and what the experiment variables are \textemdash{} i.e. model size and number of iterations. This sets up the comparison needed for RQ2.
 
+Initial testing has already been done with multiple local models available through Ollama, including Gemma 4, Qwen 3, and DeepSeek R1. Further testing will be conducted with a wider range of models. The main experimental variables are the model size, quantified by the number of parameters, and how many iterations of the feedback loop were required to reach an error-free code output. This comparison evaluates the performance of smaller local models against larger API-based models, directly addressing RQ2 regarding cost-efficiency.
 
 \subsection{Evaluation Criteria}
 
-\textit{(short paragraph)}
+% \textit{(short paragraph)}
 
-Explain how success is measured: error, warning, and info counts from the validator before and after each iteration, and the total number of API/model calls required. This ties directly back to both RQs \textemdash{} quality improvement for RQ1, and cost-efficiency for RQ2.
+% Explain how success is measured: error, warning, and info counts from the validator before and after each iteration, and the total number of API/model calls required. This ties directly back to both RQs \textemdash{} quality improvement for RQ1, and cost-efficiency for RQ2.
+
+The primary evaluation criteria for this research are the counts of errors, warnings, and informational messages reported by the validator before and after applying the guardrail process. A successful outcome is defined as the absence of issues in the final code output after the iterative process. Additionally, we will track the total number of iterations required to achieve an error-free output. By comparing these metrics across different models and configurations, we can assess both the quality improvement (RQ1) and cost-efficiency (RQ2) of the iterative feedback loop approach.
+
+
+
+
 
 % That's four subsections that flow naturally from one another, cover everything the reader needs, and leave room to breathe. You don't need a subsection on the reprompt template specifically — that level of detail is more implementation than method, and can live in a footnote or be omitted entirely for a proposal.
