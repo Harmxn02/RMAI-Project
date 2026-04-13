@@ -1,14 +1,11 @@
 \section{Research questions}
 \label{sec:research-questions}
 
-Some text. The study will address the following research questions:
+Acknowledging the issues outlined in the~\nameref{sec:background} section, this research will address the following research questions:
 
 \begin{description}
-	\item[RQ1.] First question
-	\item[RQ2.] Second question
+	\item[RQ1.]\label{item:rq1} To what extent can an iterative validation-and-regeneration guardrail improve the semantic correctness of LLM-generated HTML code and ensure adherence to best practices?
+	\item[RQ2.]\label{item:rq2} Can the guardrail enable smaller, cheaper LLMs to achieve output quality comparable to large, cloud-based models?
 \end{description}
 
-
-\textit{Write some more text before heading into the research question below}
-
-Our research question is as follows: \textit{``To what extent is it possible to use this guardrail to generate semantically correct HTML code that also adheres to best practices?''}.
+We define `correctness' and `output quality` as the presence of no errors in the code after applying the guardrail, as found by an API like the W3C Markup Validation Service. 
