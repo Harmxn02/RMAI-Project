@@ -11,7 +11,7 @@ At a high level, the guardrail system is designed as an iterative feedback loop 
 
 \begin{itemize}
 	\item \textbf{LLM for Code Generation:} We use Ollama to run local language models to generate HTML code based on a set of predefined prompts with varying levels of difficulty.
-	\item \textbf{Validation:} The code validation is performed using the W3C Markup Validation Service, which we run the from a Docker container, avoiding the risk of rate-limits if we were to use the public API.
+	\item \textbf{Validation:} The code validation is performed using the W3C Markup Validation Service, which is run from a Docker container, avoiding the risk of rate-limits if we were to use the public API.
 	\item \textbf{Reprompting Mechanism:} We have designed a Python pipeline that takes the validation results and constructs a new prompt for the LLM, which includes the original code and the specific errors and warnings identified by the validator, guiding the model to correct its mistakes in the next iteration.
 \end{itemize}
 
@@ -22,7 +22,7 @@ At a high level, the guardrail system is designed as an iterative feedback loop 
 
 % Walk through the process step by step: initial generation (using a random prompt from a predefined set) $\rightarrow$ validation $\rightarrow$ if errors are found, construct a regeneration prompt containing the incorrect code and the validation errors $\rightarrow$ regenerate $\rightarrow$ re-validate $\rightarrow$ repeat until either no errors remain or the iteration limit is reached. When the script ends you see a table of the results, showing the ERRORS, WARNINGS and INFOS counts before and after the guardrail process, with a delta (difference), and the number of iterations taken.
 
-We start the process by selecting a random prompt from a predefined set of HTML generation tasks. The LLM generates the code, which is then passed to the validator. If the validator identifies no errors or warnings, the process ends successfully. However, if there are issues, the system will first check if the maximum number of iterations has been reached. If is has, the process ends with a failure. If not, the system constructs a new prompt for the LLM that includes the original code and the specific errors and warnings reported by the validator. The LLM then is tasked to correct the code based on this feedback. This correction is then re-validated, and the loop continues until either the code is error-free or the iteration limit is reached. The process is visualised in Figure~\ref{fig:feedback-loop}. At the end of the process a summary table shows the counts of errors, warnings before and after the guardrail process. An example of a summary table is shown in Table~\ref{tab:validation-results}.
+We start the process by selecting a random prompt from a predefined set of HTML generation tasks. The LLM generates the code, which is then passed to the validator. If the validator identifies no errors or warnings, the process ends successfully. However, if there are issues, the system will first check if the maximum number of iterations has been reached. If is has, the process ends with a failure. If not, the system constructs a new prompt for the LLM that includes the original code and the specific errors and warnings reported by the validator. The LLM then is tasked to correct the code based on this feedback. This correction is then re-validated, and the loop continues until either the code is error-free or the iteration limit is reached. The process is visualised in Figure~\ref{fig:feedback-loop}. At the end of the process a summary table shows the counts of errors and warnings, before and after the guardrail process. An example of a summary table is shown in Table~\ref{tab:validation-results}.
 
 
 \subsection{Models and Configuration}
@@ -31,7 +31,7 @@ We start the process by selecting a random prompt from a predefined set of HTML 
 
 % Specificy which models will be tested (local models via Ollama vs. larger API-based models), and what the experiment variables are \textemdash{} i.e. model size and number of iterations. This sets up the comparison needed for RQ2.
 
-Initial testing has already been done with multiple local models available through Ollama, including Gemma 4, Qwen 3, and DeepSeek R1. Further testing will be conducted with a wider range of models. The main experimental variables are the model size, quantified by the number of parameters, and how many iterations of the feedback loop were required to reach an error-free code output. This comparison evaluates the performance of smaller local models against larger API-based models, directly addressing RQ2 regarding cost-efficiency.
+Initial testing has already been done with multiple local models available through Ollama, including Gemma 4, Qwen 3, and DeepSeek R1. Models with reasoning capabilities have shown to solve all mistakes in 1 iteration. Further testing will be conducted with a wider range of models. The main experimental variables are the model size, quantified by the number of parameters, and how many iterations of the feedback loop were required to reach an error-free code output. This comparison evaluates the performance of smaller local models against larger API-based models, directly addressing RQ2 regarding cost-efficiency.
 
 \subsection{Evaluation Criteria}
 
