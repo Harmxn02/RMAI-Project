@@ -65,21 +65,10 @@
 
 
 % Note. For the workshop paper template, both \title{} and \workshoptitle{} are required, with the former indicating the paper title shown in the title and the latter indicating the workshop title displayed in the footnote. 
-\title{Title}
-
-
-% The \author macro works with any number of authors. There are two commands
-% used to separate the names and addresses of multiple authors: \And and \AND.
-%
-% Using \And between authors leaves it to LaTeX to determine where to break the
-% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
-% authors names on the first line, and the last on the second line, try using
-% \AND instead of \And before the third author name.
+\title{Towards Perfect Code Generation: Iterative API-based Feedback Loops}
 
 \author{%
-Harman Preet Singh \\ Affiliation \\ Address \\ \texttt{harman.pnahal@gmail.com} \\
-% \And John Doe \\ Affiliation \\ Address \\ \texttt{john.doe@gmail.com} \\
-% \And Jane Doe \\ Affiliation \\ Address \\ \texttt{jane.doe@gmail.com} \\
+Harman Preet Singh \\[0.5em] 852863316 \\
 }
 
 \begin{document}
@@ -89,93 +78,50 @@ Harman Preet Singh \\ Affiliation \\ Address \\ \texttt{harman.pnahal@gmail.com}
 % ABSTRACT
 \input{sections/Abstract.tex}
 
-% \keywords{
-% 	keyword 1
-% 	$\cdot$ keyword 2
-% 	$\cdot$ keyword 3
-% }
+\keywords{
+	keyword 1
+	$\cdot$ keyword 2
+	$\cdot$ keyword 3
+}
 
 
-\section{Introduction}
+\section{Introduction (1 \textendash{} 1.5 pages)}
 \label{sec:introduction}
+\input{sections/1-Introduction.tex}
 
-In section~\ref{sec:related-work}, we discuss the related work.
-
-\subsection{Style}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Nulla sollicitudin dui vel purus egestas rutrum.
-Duis scelerisque lectus id mollis mollis.
-Proin vitae gravida elit.
-Nullam vestibulum leo quis ante efficitur rutrum~\citep{Smith2020}.
-In et velit sed odio suscipit condimentum vitae et nibh.
-In sed nunc in ex iaculis cursus et at velit.
-
-Morbi volutpat ante augue, in malesuada ipsum tristique et.
-Quisque sollicitudin odio justo, sed tempor neque placerat quis.
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-Duis blandit varius scelerisque.
-Quisque venenatis aliquam ex.
-Fusce et hendrerit dolor.
-
-Nam congue, tellus non faucibus molestie, sem odio dictum nisl, at venenatis nulla dui quis diam.
-Pellentesque scelerisque luctus nisl quis eleifend.
-
-\subsection{Retrieval}
-
-Donec aliquam nulla vitae elit commodo cursus
-
-\begin{center}
-	\href{https://neurips/cc}{https://neurips/cc}
-\end{center}
-
-
-Nulla hendrerit mattis purus vel dignissim~\citep{vaswani2023attentionneed}.
-Cras volutpat consequat ex, non maximus arcu suscipit sed.
-Vestibulum dapibus mi nec finibus eleifend.
-Donec erat risus, sollicitudin in sagittis ac, viverra nec sapien.
-Nullam ullamcorper luctus luctus.
-Proin sit amet ornare turpis, non convallis eros.
-Integer hendrerit urna nec quam accumsan, ut cursus velit euismod.
-Integer quis leo semper, sodales velit ac, mollis purus.
-Nunc sed faucibus mauris, in rutrum ligula.
-Etiam eget leo consequat, faucibus nunc a, rhoncus tortor.
-Sed posuere, quam vel eleifend aliquet, tortor purus finibus ex, in placerat magna quam sed dolor.
-Nulla molestie lorem eu magna vehicula, non fermentum velit tincidunt.
-Curabitur tempus pretium enim a elementum.
-Quisque eu luctus felis, a luctus justo.
-Aliquam porttitor tortor sit amet dapibus malesuada.
-
-Pellentesque volutpat magna et mauris elementum interdum.
-Sed viverra vulputate nisi in facilisis.
-Donec tempor ante vitae ullamcorper bibendum.
-Maecenas at porttitor arcu.
-Sed fringilla id enim at pretium.
-Mauris a tellus id quam vestibulum pharetra.
-Duis ut risus vestibulum ligula euismod blandit.
-Nulla sed sem dui.
-Nulla vel posuere turpis, eget ornare mi.
-Etiam lobortis sed diam quis faucibus.
-Suspendisse a commodo orci.
-Aliquam quis sodales neque.
-Suspendisse id magna vehicula, ultrices augue nec, maximus turpis.
-
-\section{Related Work}
+\section{Related Work (2 \textendash{} 3 pages) }
 \label{sec:related-work}
+\input{sections/2-Related-work.tex}
 
-\section{Experimental results}
-\label{sec:experimental-results}
+\section{Research Questions \& Hypotheses (0.5 pages)}
+\label{sec:research-questions}
+\input{sections/3-Research-questions.tex}
 
-\section{Discussion}
+\section{Methodology (4 \textendash{} 5 pages)}
+\label{sec:methodology}
+\input{sections/4-Methodology.tex}
+
+\section{Experimental Setup (1 \textendash{} 1.5 pages)}
+\label{sec:experimental-setup}
+\input{sections/5-Experimental-setup.tex}
+
+\section{Results (3 \textendash{} 4 pages)}
+\label{sec:results}
+\input{sections/6-Results.tex}
+
+\section{Discussion (2 \textendash{} 3 pages)}
 \label{sec:discussion}
 
-\subsubsection*{Acknowledgments}
+\section{Conclusion (0.5 \textendash{} 1 page)}
+\label{sec:conclusion}
+
+
 
 % \bibliographystyle{plainnat}
 \bibliography{references}
 
 % (optional) APPENDIX
-% \input{sections/Appendix.tex}
+\input{sections/Appendix.tex}
 
 
 \end{document}
