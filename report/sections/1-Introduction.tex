@@ -3,24 +3,38 @@
 
 % = PARAGRAPH 1 = The capability and the blind spot}
 
-Open with the undeniable strenght of LLMs at code generation \textemdash{} they produce syntactically valid, compilable, visually correct HTML. Then immediately introduce the tension: syntactic correctness is not the same as semantic correctness. The code works, but that doesn't mean it's right.
+% Open with the undeniable strenght of LLMs at code generation \textemdash{} they produce syntactically valid, compilable, visually correct HTML. Then immediately introduce the tension: syntactic correctness is not the same as semantic correctness. The code works, but that doesn't mean it's right.
+
+Large Language Models (LLMs) are increasingly used in the field of software development for the generation of code, including HTML. These models are very capable of producing syntactically valid HTML that renders correctly in web browsers. However, there is a significant blind spot: while the generated code may be syntactically correct, it often lacks semantic correctness. In other words, the code functions as intended, but it may not adhere to best practices.
 
 % = PARAGRAPH 2 = The divitis problem
 
-Explain the specific bad habit: overuse of \verb|<div>| where semantically meaningful tags tags (\verb|<section>|, \verb|<article>|, \verb|<nav>|, \verb|<header>|, etc.) should be used. Keep it concrete \textemdash{} give a brief illustrative example of what "divitis" looks like and why a developer might not even notice it. Mention that LLMs are trained on real-world code, which already contains this pattern, making them likely to reproduce it.
+% Explain the specific bad habit: overuse of \verb|<div>| where semantically meaningful tags tags (\verb|<section>|, \verb|<article>|, \verb|<nav>|, \verb|<header>|, etc.) should be used. Keep it concrete \textemdash{} give a brief illustrative example of what "divitis" looks like and why a developer might not even notice it. Mention that LLMs are trained on real-world code, which already contains this pattern, making them likely to reproduce it.
+
+This potential non-adherence to semantic best practices is often seen in the overuse of the \verb|<div>| tag, a phenomenon colloquially referred to as "divitis". Instead of using semantically meaningful tags in layout and content structure, such as \verb|<section>| to denote sections or \verb|<article>| for articles, developers may default to using \verb|<div>| tags. For example, a developer might wrap an entire article in a \verb|<div>| instead of using the more appropriate \verb|<article>| tag. LLMs are trained on real code snippets, which often contain this pattern, making them likely to reproduce it in their generated output. Additionally, if a codebase already contains a significant amount of "divitis" code-generation tools like Claude Code may produce new code that perpetuates this issue.
+
 
 % = PARAGRAPH 3 = Why it matters
+ 
+% Explain the consequences. Two angles: (1) maintainability \textemdash{} tags make codebases easier to read, maintain and extend; (2) accessibility \textemdash{} screen readers rely on semantic structure to navigate pages for users with visual impairments. This is where you make the societal relevance concrete. Keep it brief but pointed.
 
-Explain the consequences. Two angles: (1) maintainability \textemdash{} tags make codebases easier to read, maintain and extend; (2) accessibility \textemdash{} screen readers rely on semantic structure to navigate pages for users with visual impairments. This is where you make the societal relevance concrete. Keep it brief but pointed.
+There are two real consequences. Code that is hard to maintain, as the semantic meaning of the content has become an afterthought. But more importantly, users with visual impairments who rely on screen readers are negatively affected because screen readers use the semantic structure of a webpage to navigate them. A lack of semantic structure can make it difficult for these users to understand the content and context of a page.
 
 % = PARAGRAPH 4 = The gap: no reliable guardrail
 
-Transition to the problem space. Even if you instruct an LLM via a system prompt to use semantic tags, compliance is not guaranteed \textemdash{} especially for smaller or local models. There is currently no widely adopted automated mechanism that catches and corrects this class of semantic errors in LLM-generated HTML. This sets up your contribution without going into related work yet.
+% Transition to the problem space. Even if you instruct an LLM via a system prompt to use semantic tags, compliance is not guaranteed \textemdash{} especially for smaller or local models. There is currently no widely adopted automated mechanism that catches and corrects this class of semantic errors in LLM-generated HTML. This sets up your contribution without going into related work yet.
+
+Instructing an LLM to use semantic tags through a system prompt or explicit instructions within the prompt itself does not guarantee compliance, particularly for smaller or local models. There is a need for a reliable automated mechanism that can catch and correct this class of semantic errors in LLM-generated HTML. 
+
 
 % = PARAGRAPH 5 = Your proposed solution (high level)
 
-Introduce the guardrail concept in one short paragraph: an iterative validation-and-regeneration feedback loop. The W3C validator flags issues; the LLM is reprompted with its own errors; the loop runs until the output is clear or a maximum iteration count is reached. Do not go into implementation details here \textemdash{} just enoug to orient the reader.
+% Introduce the guardrail concept in one short paragraph: an iterative validation-and-regeneration feedback loop. The W3C validator flags issues; the LLM is reprompted with its own errors; the loop runs until the output is clear or a maximum iteration count is reached. Do not go into implementation details here \textemdash{} just enoug to orient the reader.
+
+We propose a solution in the form of an iterative validation-and-regeneration feedback loop. In this approach, the LLM-generated HTML is first validated using a validator tool which can flag semantic issues. The LLM is then reprompted with the identified errors, allowing it to correct its output. This loop continues until the output is free of errors or a maximum number of iterations is reached.
 
 % = PARAGRAPH 6 = Research questions and roadmap
 
-State RQ1 and RQ2 explicitly. Then close with a one or two sentence roadmap: "The remainder of this report is structured as follows: Section 2 reviews related work, Section 3 presents the methodology..." and so on.
+% State RQ1 and RQ2 explicitly. Then close with a one or two sentence roadmap: "The remainder of this report is structured as follows: Section 2 reviews related work, Section 3 presents the methodology..." and so on.
+
+In this report, we aim to find out (RQ1) to what extent an iterative feedback loop can improve the semantic correctness of LLM-generated HTML code, and (RQ2) whether this guardrail approach can enable smaller, cheaper LLMs to achieve semantic correctness comparable to larger models. The remainder of this report is structured as follows: Section \ref{sec:related-work} reviews related work, Section \ref{sec:research-questions} presents the research questions and hypotheses, Section \ref{sec:methodology} details the methodology, Section \ref{sec:experimental-setup} describes the experimental setup, Section \ref{sec:results} presents the results, and Section \ref{sec:discussion} discusses the findings and implications. Finally, we conclude with a summary of our contributions and potential future work.
