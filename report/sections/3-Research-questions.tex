@@ -2,12 +2,25 @@
 
 % = PARAGRAPH 1 = RQ1
 
-State RQ1 formally and precisely. Then in one or two sentences, give a brief rationale for why this question is answerable with your design \textemdash{} the before/after error counts and the feedback vs. blind ablation directly operationalise it.
+% State RQ1 formally and precisely. Then in one or two sentences, give a brief rationale for why this question is answerable with your design \textemdash{} the before/after error counts and the feedback vs. blind ablation directly operationalise it.
+
+We aim to answer two research questions:
+
+\begin{enumerate}
+	\item \textbf{RQ1:} Does the iterative API-based feedback loop improve the quality of code generation? We operationalise "quality" as the reduction in the number of errors in the generated code, measured before and after applying the feedback loop. 
+	\item \textbf{RQ2:} Does this guardrail approach enable smaller, cheaper LLMs to achieve comparable quality to larger, more expensive models? We define "comparable quality" as equivalent error reduction rates, and "cost" is measured via mean generation time per prompt per model. Cloud-based models are explicitly out of scope for this study, as all models are run locally through Ollama, ensuring consistent evaluation conditions and avoiding external dependencies.
+\end{enumerate}
+
+
 
 % = PARAGRAPH 2 = RQ2
 
-State RQ2 formally. Clarify the operationalisation: "comparable quality" is defined as equivalent error reduction rates, and "cost" is measured via mean generation time per prompt per model. One sentence noting that cloud models are explicitly out of scope for this study, and why (all models run locally through Ollama).
+% State RQ2 formally. Clarify the operationalisation: "comparable quality" is defined as equivalent error reduction rates, and "cost" is measured via mean generation time per prompt per model. One sentence noting that cloud models are explicitly out of scope for this study, and why (all models run locally through Ollama).
 
 % = PARAGRAPH 3 = Hypotheses (optional but recommended)
 
-Add brief hypotheses grounded in your initial testing. For example: reasoning-capable models are expected to converge faster regardless of parameter count; the feedback condition is expected to outperform the blind condition across all models; harder prompts are expected to require more iterations. These give the Results section something concrete to confirm or challenge, with the rubric rewards under "in-depth analysis".
+% Add brief hypotheses grounded in your initial testing. For example: reasoning-capable models are expected to converge faster regardless of parameter count; the feedback condition is expected to outperform the blind condition across all models; harder prompts are expected to require more iterations. These give the Results section something concrete to confirm or challenge, with the rubric rewards under "in-depth analysis".
+
+To evaluate our feedback loop, we also test the models under a blind condition, where the regeneration is performed without detailed feedback. This allows us to isolate the effect of the feedback loop. 
+
+We expect the feedback condition to outperform the blind condition across all models, as the iterative feedback loop provides targeted guidance for error correction. Furthermore, we hypothesise that reasoning-capable models (i.e., models that think and reason through the problem before generating code) will converge faster regardless of parameter count. Additionally, we expect that difficult prompts will require more iterations to achieve error-free code generation.
