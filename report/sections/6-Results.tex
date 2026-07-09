@@ -2,10 +2,18 @@
 
 Report error/warning counts before and after the guardrail, per model and per prompt. Show whether the guardrail improves semantic correctness — and be careful to distinguish between W3C validation errors and semantic correctness (flag this distinction explicitly here).
 
+\textbf{Change}: Results now need to be broken down by condition (\verb|feedback| vs \verb|blind|) as well as by model and difficulty tier, not just before/after. The statistical analysis uses paired Wilcoxon tests and 95\% confidence intervals, which should be stated. Also add error category breakdown as a dimension (missing-doctype, stray-tag, disallowed-attribute, etc.).
+
+
 \subsection{RQ2 \textemdash{} Cost-Efficiency}
 
 Compare smaller vs. larger models on quality metrics at various iteration counts. Show the quality-vs-cost tradeoff curve. Establish a baseline for large API-based models (or compare against a cited benchmark) as your supervisor suggested.
 
+\textbf{Change}: Reframe this — the comparison is smaller vs. larger local models only, not local vs. cloud. Add the reasoning vs. non-reasoning dimension as a key finding here, since it turns out to be more predictive of success than parameter count alone. The scatter plots (model size vs. cost/quality, coloured by native thinking mode) directly address this.
+
+
 \subsection{Iteration Count Analysis}
 
 When does the loop converge? Is there a diminishing return after N iterations? This is where you answer the "optimal number of iterations" question.
+
+\textbf{Change}: No major structural change, but the analysis now comes from \verb|stats.py|'s iteration-cutoff analysis, which is worth naming explicitly as the source of the convergence findings.

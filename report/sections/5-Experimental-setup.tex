@@ -1,1 +1,3 @@
 Describe the practical setup: hardware, software versions, Docker configuration, Ollama setup, which specific model versions/quantisations you used, and how you controlled for variability between runs. Include any pilot/exploratory results that informed your final setup (you already have some initial results with Gemma 4, Qwen 3, DeepSeek R1).
+
+\textbf{Change}: Add mention of repeated trials per (model, prompt) combination, which enables variance estimation and confidence intervals rather than relying on single-run results. Also mention the \verb|was_cleaned| flag, the pipeline strips markdown fences/preamble before validation, so formatting slip-ups are never counted as HTML errors (important for validity of the before/after comparison).

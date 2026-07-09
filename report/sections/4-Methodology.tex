@@ -7,9 +7,16 @@ Describe the three components (LLM, validator, reprompting pipeline) and how the
 
 Describe how you constructed your prompt set. How many prompts? How did you decide which ones to include? Did you deliberately design some to provoke semantic tag errors (e.g. tasks that structurally require \verb|<nav>|, \verb|<article>|, etc.)? This directly addresses the supervisor's feedback about the random prompt selection being unclear.
 
+\textbf{Change}: Remove the mention of random sampling — the dataset is now a fixed, ordered set of 51 prompts across three difficulty tiers (simple / medium / difficult). Describe how prompts were designed across tiers, and that the fixed ordering ensures apples-to-apples model comparisons.
+
+
 \subsection{Models \& Configurations}
 
 List all models tested. Describe the parameter ranges (size, quantisation). Explain how you vary the maximum iteration count and how you determine when you've found the "optimal" cut-off — frame this as a quality-vs-cost tradeoff that you measure empirically.
+
+\textbf{Change}: Expand this significantly. You now have a concrete model table to discuss (gemma4:e2b, qwen3:8b, qwen2.5-coder:14b, qwen3.5:9b) with an interesting emerging finding: reasoning capability matters more than parameter count. qwen2.5-coder:14b has more parameters than the others combined, yet it fails to fix issues because it lacks reasoning. This is now a key variable alongside model size. Add \verb|temperature| and deterministically derived \verb|seed| as explicit configuration parameters worth mentioning for reproducibility.
+
+
 
 \subsection{Validation Strategy}
 
@@ -23,7 +30,14 @@ This is the most critical methodological section. Address the supervisor's conce
 
 Clarify what "comparable output quality" means for RQ2 — define your quality metric explicitly.
 
+\textbf{Change}: Add a subsection on the blind ablation control. This is a significant addition — for each run, the pipeline now runs both a \verb|feedback| condition (model sees validator errors) and a \verb|blind| condition (model is only told to "review and fix"). This lets you isolate how much improvement comes from the validator feedback itself versus simply giving the model a second attempt. This is important to call out as a deliberate design choice.
+
+Also add: \verb|check_validator_determinism.py| is used to verify the W3C validator itself is stable before trusting any before/after deltas, worth mentioning as a validity check.
+
+
 
 \subsection{Cost Metric}
 
 Define how you operationalise "cost" — API pricing per token, latency, or total tokens consumed per run. This addresses the supervisor's question about RQ2's cost dimension.
+
+\textbf{Change}: Clarify that cost is proxied via generation latency and token counts (not API pricing), since all models run locally through Ollama. The results schema captures \verb|gen_time_s|, \verb|prompt_eval_count|, and \verb|eval_count| per iteration. Note explicitly that no cloud/API-based model baseline is included in this pipeline (as stated in the repo's Scope section) — this is a scope limitation to acknowledge.
