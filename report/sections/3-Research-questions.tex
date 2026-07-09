@@ -1,1 +1,13 @@
-Formally state RQ1 and RQ2. You can also add brief hypotheses based on your initial testing (e.g. reasoning models converge faster).
+% Formally state RQ1 and RQ2. You can also add brief hypotheses based on your initial testing (e.g. reasoning models converge faster).
+
+% = PARAGRAPH 1 = RQ1
+
+State RQ1 formally and precisely. Then in one or two sentences, give a brief rationale for why this question is answerable with your design \textemdash{} the before/after error counts and the feedback vs. blind ablation directly operationalise it.
+
+% = PARAGRAPH 2 = RQ2
+
+State RQ2 formally. Clarify the operationalisation: "comparable quality" is defined as equivalent error reduction rates, and "cost" is measured via mean generation time per prompt per model. One sentence noting that cloud models are explicitly out of scope for this study, and why (all models run locally through Ollama).
+
+% = PARAGRAPH 3 = Hypotheses (optional but recommended)
+
+Add brief hypotheses grounded in your initial testing. For example: reasoning-capable models are expected to converge faster regardless of parameter count; the feedback condition is expected to outperform the blind condition across all models; harder prompts are expected to require more iterations. These give the Results section something concrete to confirm or challenge, with the rubric rewards under "in-depth analysis".

@@ -1,10 +1,34 @@
-This is the section most notably missing from the proposal. Cover:
+% This is the section most notably missing from the proposal. Cover:
 
-\begin{itemize}
-	\item Existing work on LLM code quality and hallucinations
-	\item Prior research on iterative feedback / self-correction loops for LLMs (e.g. the paper your supervisor linked: https://arxiv.org/html/2603.23613v1 — which uses multiple feedback models)
-	\item Prior work on automated code validation as a guardrail
-	\item Any existing evaluations of HTML semantic quality
-\end{itemize}
+% \begin{itemize}
+% 	\item Existing work on LLM code quality and hallucinations
+% 	\item Prior research on iterative feedback / self-correction loops for LLMs (e.g. the paper your supervisor linked: https://arxiv.org/html/2603.23613v1 — which uses multiple feedback models)
+% 	\item Prior work on automated code validation as a guardrail
+% 	\item Any existing evaluations of HTML semantic quality
+% \end{itemize}
 
-Keep in mind: Your supervisor explicitly flagged the absence of related work. This section also gives you the opportunity to position your contribution clearly — what does your approach do differently or better?
+% Keep in mind: Your supervisor explicitly flagged the absence of related work. This section also gives you the opportunity to position your contribution clearly — what does your approach do differently or better?
+
+% = PARAGRAPH 1 = Opening: framing the literature landscape
+
+Brief orienting paragraph. Signal that the related work spans three interconnected areas: (1) LLM code generation quality, (2) iterative self-correction and feedback loops, and (3) HTML semantic quality and validation. Tell the reader you'll cover each in turn. This prevents the section from reading as a disconnected list of papers.
+
+% = PARAGRAPH 2/3 = LLM code generation and its limits
+
+Discuss what the literature says about LLMs generating code \textemdash{} their strenghts, but also the documented tendency to reproduce patterns from training data including bad practices. This is where you cite the \citet{souly2025poisoningattacksllmsrequire} poisining paper from your proposal. Expand beyond that one source: are there other papers documenting LLM code quality issues or bias towards common but suboptimal patterns? End with a critical note: most evaluation work focuses on functional correctness (does it run?) rather than semantic or stylistic correctness \textemdash{} this is a gap your work addresses.
+
+% = PARAGRAPH 4/5 = Iterative feedback and self-correction loops
+
+This is the densest part of the related work. Cover the landscape of your approaches where LLMs are given feedback and asked to revise their output. The paper your supervisor linked (\citep{ravi2025llmloopimprovingllmgeneratedcode}) is central here \textemdash{} discuss how it uses multiple feedback models rather than a single validator. Constrast it with your approach: you use an external, deterministic validator rather than another LLM as the feedback source, which avoids introducing a second model's biases. Identify what the literature agrees on (iterative feedback generally helps) and where there are gaps or contradictions (optimal iteration count, diminishing returns, cost trade-offs are rarely studied together).
+
+% = PARAGRAPH 6 = Smaller vs. larger models and cost-efficiency
+
+Review any existing literature comparing model sizes on code tasks. What do prior studies say about whether smaller models can close the gap with large ones given more attempts or better prompting? If the literature is thin here (it likely is for this specific use case), say so explicitly \textemdash{} this positions RQ2 as a genuine open question rather than a settled one.
+
+% = PARAGRAPH 7 = HTML semantic quality and validation tools
+
+Discuss what is know about HTML semantic quality as a measurable property. Cover the W3C Markup Validation Service \textemdash{} what it does and does not detect. Be critical here: the validator is designed for syntactic and structural conformance, not semantic intent. Acknowledge this gap honestly. If there is prior work using automated validation as a proxy for code quality, discuss it and its limitations.
+
+% = PARAGRAPH 8 = Synthesis: what is missing and how your work fills it
+
+Close the section by pulling the threads together. No prior work combines an external deterministic validator, an iterative reprompting loop, a blind ablation control, and a cost-efficiency comparison across model sizes in the context of HTML semantic quality. This is your contribution's position in the literature. Keep this focused \textemdash{} one tight paragraph, not a repeat of the introduction.
