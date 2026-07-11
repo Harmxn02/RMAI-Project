@@ -60,6 +60,7 @@ All models are evaluated on the exact same 51 prompts in the same order. We opte
 
 
 \subsection{Models \& Configurations}
+\label{subsec:models-configurations}
 
 % List all models tested. Describe the parameter ranges (size, quantisation). Explain how you vary the maximum iteration count and how you determine when you've found the "optimal" cut-off — frame this as a quality-vs-cost tradeoff that you measure empirically.
 
@@ -69,18 +70,41 @@ All models are evaluated on the exact same 51 prompts in the same order. We opte
 
 % Explain why you chose the models you did. The selection spans a range of parameter counts and a simple binary range of reasoning capabilities, which is deliberate -- you want both axes to vary so you can disentangle their effects. Mention that all models are available through Ollama and run locally, which keeps the hardware environment constant.
 
-We selected a range of models that vary in both parameter count and reasoning capability. Additionally, all models are available through Ollama and run locally, which keeps the hardware environment constant.
+We selected a range of models that vary in both parameter count and reasoning capability. Additionally, all models are available through Ollama and run locally at full precision (no quantisation was used), which keeps the hardware environment constant. An interesting finding from our initial testing was that reasoning capability matters more than parameter count. Smaller models with reasoning capability outperformed larger models without it. This finding shaped our final model selection, as we wanted to ensure that both axes (parameter count and reasoning capability) were represented in our experiments. An overview of all evaluated models is provided in Table~\ref{tab:model-summary}. The table includes the model name, parameter count, reasoning capability (yes/no)
 
 
 % = PARAGRAPH 3 = The reasoning capability variable
 
-Introduce reasoning capability as an explicit experimental variable, distinct from parameter count. Flag the key constrast: codestral:22b has the most parameters but lacks native reasoning, while smaller reasoning models outperform it. This is not a post-hoc observation -- it was an emerging finding from initial testing that shaped the final model selection. Present a model summary table here (model name, parameter count, reasoning: yes/no, quantisation -> always no for us).
+% Introduce reasoning capability as an explicit experimental variable, distinct from parameter count. Flag the key constrast: codestral:22b has the most parameters but lacks native reasoning, while smaller reasoning models outperform it. This is not a post-hoc observation -- it was an emerging finding from initial testing that shaped the final model selection. Present a model summary table here (model name, parameter count, reasoning: yes/no, quantisation -> always no for us).
+
+
+
+\begin{table}[H]
+	\centering
+	\caption{Overview of all evaluated models}
+	\label{tab:model-summary}
+	\begin{tabular}{lccc}
+		\toprule
+		Model               & Parameters (B) & Reasoning \\
+		\midrule
+		gemma3:1b           & 1              & No        \\
+		qwen3:4b-thinking   & 4              & Yes       \\
+		deepseek-coder:6.7b & 6.7            & No        \\
+		gemma4:e4b          & 8              & Yes       \\
+		qwen2.5-coder:14b   & 14.8           & No        \\
+		codestral:22b       & 22             & No        \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
 % Model summary table: see tables.tex, Table~\ref{tab:model-summary} (tab:model-summary). Source: config/model_info.yaml in the LLM Validator submodule. Note smollm2:135m was also run (full data in results/experiments.csv) but has no model_info.yaml entry, so it's excluded from this table and from every reasoning/parameter-count-based analysis in the Results section -- worth a one-line mention if you want to account for all 7 models tested rather than just the 6 with confirmed reasoning-mode metadata.
 
 % = PARAGRAPH 4 = Iteration count as a variable
 
-Explain that the maximum iteration count is itself a parameter of interest. You run each (model, prompt, condition) combination up to the maximum, recording when convergence occurs. This lets you analyse diminishing returns and determine the practical cut-off beyond which additional iterations yield negligible improvements -- which feeds directly into the cost-quality tradeoff in RQ2.
+% Explain that the maximum iteration count is itself a parameter of interest. You run each (model, prompt, condition) combination up to the maximum, recording when convergence occurs. This lets you analyse diminishing returns and determine the practical cut-off beyond which additional iterations yield negligible improvements -- which feeds directly into the cost-quality tradeoff in RQ2.
+
+We set the maximum iteration count as a parameter of interest. For each (model, prompt, condition) combination, we run the pipeline up to the maximum number of iterations, recording when convergence occurs. This allows us to analyse diminishing returns and determine the practical cut-off beyond which additional iterations yield negligible improvements. This is important for understanding the cost-quality tradeoff in RQ2, as it tells us how many iterations are really necessary.
+
 
 \subsection{Validation Strategy}
 
@@ -100,19 +124,31 @@ Explain that the maximum iteration count is itself a parameter of interest. You 
 
 % = PARAGRAPH 1 = What the W3C validator measures
 
-Be transparent upfront: the W3C Markup Validation Service checks structural and syntactic conformance to the HTML specification. It does not evaluate semantic intent -- it cannot tell you that \verb|<div class="nav">| is worse than \verb|<nav>|. State this limitation clearly, because it is the central methodological tension of your study.
+% Be transparent upfront: the W3C Markup Validation Service checks structural and syntactic conformance to the HTML specification. It does not evaluate semantic intent -- it cannot tell you that \verb|<div class="nav">| is worse than \verb|<nav>|. State this limitation clearly, because it is the central methodological tension of your study.
+
+The validator checks structural and syntactic conformance to the HTML specification. A limitation of the validator is that it cannot evaluate semantic intent. For example, it cannot tell you that \verb|<div class="nav">| is worse than \verb|<nav>| because both are syntactically valid.
+
 
 % = PARAGRAPH 2 = What does it capture and why it's still useful
 
-Despite this, the validator is a meaningful signal. Many divitis-related errors manifest as structural issues (missing landmark elements, improper nesting, attribute misuse) that the validator does flag. Argue that error/warning count reduction is a necessary but not sufficient proxy for semantic improvement -- useful, but it must be triangulated with other measures.
+% Despite this, the validator is a meaningful signal. Many divitis-related errors manifest as structural issues (missing landmark elements, improper nesting, attribute misuse) that the validator does flag. Argue that error/warning count reduction is a necessary but not sufficient proxy for semantic improvement -- useful, but it must be triangulated with other measures.
+
+Despite this limitation, the validator is still a meaningful signal. It can still detect many structural issues such as improper nesting, missing landmark elements, and attribute misuse. While error/warning count reduction is a necessary but not sufficient proxy for semantic improvement, it is still useful and can be triangulated with other measures.
+
 
 % = PARAGRAPH 3 = Blind ablation control
 
-Introduce the blind condition as a deliberate experimental control. For every (model, prompt) pair, the pipeline runs two conditions in parallel: the \verb|feedback| condition (the model receives the validator's specific error list) and the \verb|blind| condition (the model is simply told to review and improve its output, with no error details). The difference in outcomes between these conditions isolates the contribution of the validator feedback itself, distinguishing it from the general benefit of giving a model a second attempt.
+% Introduce the blind condition as a deliberate experimental control. For every (model, prompt) pair, the pipeline runs two conditions in parallel: the \verb|feedback| condition (the model receives the validator's specific error list) and the \verb|blind| condition (the model is simply told to review and improve its output, with no error details). The difference in outcomes between these conditions isolates the contribution of the validator feedback itself, distinguishing it from the general benefit of giving a model a second attempt.
+
+In addition to running the pipeline in the feedback condition, we also run it in a blind condition. In the blind condition, the model is simply told to review and improve its output, with no error details provided. This allows us to isolate the contribution of the validator feedback itself, distinguishing it from the general benefit of giving a model a second attempt.
+
 
 % = PARAGRAPH 5 = Validator determinism check
 
-Explain the role of \verb|check_validator_determinism.py|. Before trusting any before/after deltas, you verify that the validator produces identical results when run on the same HTML input multiple times. This is a non-trivial validity check -- if the validator were stochastic, your improvement metrics would be meaningless. State the result of this check (presumably: the validator is deterministic).
+% Explain the role of \verb|check_validator_determinism.py|. Before trusting any before/after deltas, you verify that the validator produces identical results when run on the same HTML input multiple times. This is a non-trivial validity check -- if the validator were stochastic, your improvement metrics would be meaningless. State the result of this check (presumably: the validator is deterministic).
+
+In related work where code quality was evaluated, the validator used was other LLMs, which struggle to provide deterministic outputs. To ensure that the validator is deterministic, we run a check on the same HTML input multiple times to verify that the validator produces identical results. This is non-trivial. If the validator were stochastic, our improvement metrics would be meaningless. We found that the validator is indeed deterministic, which gives us confidence in our before/after deltas.
+
 
 
 
@@ -124,15 +160,13 @@ Explain the role of \verb|check_validator_determinism.py|. Before trusting any b
 
 % = PARAGRAPH 1 = Operationalising cost locally
 
-Explain that since all moedls run locally via Ollama, there is no API pricing to measure. Instead, cost is proxied through three values captured per iteration: \verb|gen_time_s| (wall-clock generation time), \verb|prompt_eval_count| (tokens in the prompt), and \verb|eval_count| (tokens generated). These together give a picture of both time cost and computational load per run.
+% Explain that since all moedls run locally via Ollama, there is no API pricing to measure. Instead, cost is proxied through three values captured per iteration: \verb|gen_time_s| (wall-clock generation time), \verb|prompt_eval_count| (tokens in the prompt), and \verb|eval_count| (tokens generated). These together give a picture of both time cost and computational load per run.
+
+Since all models run locally via Ollama, there is no API pricing to measure. Instead, we proxy cost through three values captured per iteration: \verb|gen_time_s| (wall-clock generation time), \verb|prompt_eval_count| (tokens in the prompt), and \verb|eval_count| (tokens generated). These together give a picture of both time cost and computational load per run.
+
 
 % = PARAGRAPH 2 = Scope limitation: no cloud baseline
 
-Acknowledge explicitly that no cloud-hosted large model (e.g. GPT-4o, Claude) is included in this study. The comparison is therefore entirely within the local model ecosystem. State this as a deliberate scope boundary -- cloud API costs introduce pricing variables outside your control -- and note it as a direction for future work. This is an honest limitation rather than a flaw, as long as it is named.
+% Acknowledge explicitly that no cloud-hosted large model (e.g. GPT-4o, Claude) is included in this study. The comparison is therefore entirely within the local model ecosystem. State this as a deliberate scope boundary -- cloud API costs introduce pricing variables outside your control -- and note it as a direction for future work. This is an honest limitation rather than a flaw, as long as it is named.
 
-
-
-
-
-
-
+We acknowledge that no cloud-hosted large model (e.g., GPT-4o, Claude) is included in this study. The comparison is therefore entirely within the local model ecosystem. This is a deliberate scope boundary, as cloud API costs introduce pricing variables outside our control. We note this as a direction for future work.
