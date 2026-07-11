@@ -8,6 +8,9 @@
 !*.md
 !*.sty
 
+# Images
+!*.png
+
 # .gitignore itself
 !.gitignore
 
