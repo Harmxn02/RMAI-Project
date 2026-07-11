@@ -46,6 +46,8 @@ Explain why you chose the models you did. The selection spans a range of paramet
 
 Introduce reasoning capability as an explicit experimental variable, distinct from parameter count. Flag the key constrast: codestral:22b has the most parameters but lacks native reasoning, while smaller reasoning models outperform it. This is not a post-hoc observation -- it was an emerging finding from initial testing that shaped the final model selection. Present a model summary table here (model name, parameter count, reasoning: yes/no, quantisation -> always no for us).
 
+% Model summary table: see tables.tex, Table~\ref{tab:model-summary} (tab:model-summary). Source: config/model_info.yaml in the LLM Validator submodule. Note smollm2:135m was also run (full data in results/experiments.csv) but has no model_info.yaml entry, so it's excluded from this table and from every reasoning/parameter-count-based analysis in the Results section -- worth a one-line mention if you want to account for all 7 models tested rather than just the 6 with confirmed reasoning-mode metadata.
+
 % = PARAGRAPH 4 = Iteration count as a variable
 
 Explain that the maximum iteration count is itself a parameter of interest. You run each (model, prompt, condition) combination up to the maximum, recording when convergence occurs. This lets you analyse diminishing returns and determine the practical cut-off beyond which additional iterations yield negligible improvements -- which feeds directly into the cost-quality tradeoff in RQ2.
