@@ -1,43 +1,106 @@
 \subsection{System Architecture}
 
-Describe the three components (LLM, validator, reprompting pipeline) and how they interact. Include your flowchart (Figure A1). Explain design choices, e.g. why Docker-hosted W3C rather than the public API.
+% Describe the three components (LLM, validator, reprompting pipeline) and how they interact. Include your flowchart (Figure A1). Explain design choices, e.g. why Docker-hosted W3C rather than the public API.
 
+% = PARAGRAPH 1 = Overview of the three components
+
+Introduce the three pillars of the system: the LLM (served locally via Ollama), the 'Nu Html Checker (vnu)' service (hosted in Docker~\footnote{ghcr.io/validator/validator:latest}), and the Python orchestration pipeline. Explain that these are deliberately kept modular -- the LLM and validator are interchangable without rewriting the pipeline. This modularity is a design choice worth stating explicitly. Mention that we will refer to the validator as 'the validator'.
+
+% = PARAGRAPH 2 = The feedback loop, step by step
+
+Walk through one full iteration of the loop: prompt -> LLM generates HTML -> validator checks it -> if errors exist and the iteration limit is not reached -> reprompt with original code + error list -> repeat. Reference your flowchart figure here. Keep it process-focused, not implementation-focused.
+
+% = PARAGRAPH 3 = Design choice: Docker over public W3C API
+
+Justify why you run the validator locally in Docker rather than hitting the public API. Two reasons: avoiding rate limits during large-scale batch runs across 51 prompts x multiple models x multiple conditions, and ensuring the validator version is pinned and consistent across all runs. The latter matters for reproducibility.
 
 \subsection{Prompt Dataset}
 
-Describe how you constructed your prompt set. How many prompts? How did you decide which ones to include? Did you deliberately design some to provoke semantic tag errors (e.g. tasks that structurally require \verb|<nav>|, \verb|<article>|, etc.)? This directly addresses the supervisor's feedback about the random prompt selection being unclear.
+% Describe how you constructed your prompt set. How many prompts? How did you decide which ones to include? Did you deliberately design some to provoke semantic tag errors (e.g. tasks that structurally require \verb|<nav>|, \verb|<article>|, etc.)? This directly addresses the supervisor's feedback about the random prompt selection being unclear.
 
-\textbf{Change}: Remove the mention of random sampling — the dataset is now a fixed, ordered set of 51 prompts across three difficulty tiers (simple / medium / difficult). Describe how prompts were designed across tiers, and that the fixed ordering ensures apples-to-apples model comparisons.
+% \textbf{Change}: Remove the mention of random sampling — the dataset is now a fixed, ordered set of 51 prompts across three difficulty tiers (simple / medium / difficult). Describe how prompts were designed across tiers, and that the fixed ordering ensures apples-to-apples model comparisons.
 
+% = PARAGRAPH 1 = Construction rationale
+
+Explain that the prompt set was hand-crafted rather than sampled from an existing benchmark, because no established benchmark exists for HTML semantic quality specifically. The goal was to create tasks that structurally require semantic tags -- so that a model defaulting to \verb|<div>| produces objectively worse output. This justifies the custom dataset.
+
+% = PARAGRAPH 2 = The three difficulty tiers
+
+Describe the tiered structure: simple (single-component pages), medium (multi-section layouts), difficult (complex interactive or multi-role pages). Explain what makes a prompt "harder" -- more opportunities for semantic tags, more structural complexity, higher chance of divitis. Give one or two illustrative examples per tier without listing all 51.
+
+% = PARAGRAPH 3 = Fixed ordering and comparability
+
+Explain that all models are evaluated on the exact same 51 prompts in the same order. This fixed design ensures that differences in results are attributable to the model or condition, not to prompt sampling variance. Constrast this briefly with a random-sampling approach and why you rejected it. (how I initially did it)
 
 \subsection{Models \& Configurations}
 
-List all models tested. Describe the parameter ranges (size, quantisation). Explain how you vary the maximum iteration count and how you determine when you've found the "optimal" cut-off — frame this as a quality-vs-cost tradeoff that you measure empirically.
+% List all models tested. Describe the parameter ranges (size, quantisation). Explain how you vary the maximum iteration count and how you determine when you've found the "optimal" cut-off — frame this as a quality-vs-cost tradeoff that you measure empirically.
 
-\textbf{Change}: Expand this significantly. You now have a concrete model table to discuss (gemma4:e2b, qwen3:8b, qwen2.5-coder:14b, qwen3.5:9b) with an interesting emerging finding: reasoning capability matters more than parameter count. qwen2.5-coder:14b has more parameters than the others combined, yet it fails to fix issues because it lacks reasoning. This is now a key variable alongside model size. Add \verb|temperature| and deterministically derived \verb|seed| as explicit configuration parameters worth mentioning for reproducibility.
+% \textbf{Change}: Expand this significantly. You now have a concrete model table to discuss (gemma4:e2b, qwen3:8b, qwen2.5-coder:14b, qwen3.5:9b) with an interesting emerging finding: reasoning capability matters more than parameter count. qwen2.5-coder:14b has more parameters than the others combined, yet it fails to fix issues because it lacks reasoning. This is now a key variable alongside model size. Add \verb|temperature| and deterministically derived \verb|seed| as explicit configuration parameters worth mentioning for reproducibility.
 
+% = PARAGRAPH 1 = Model selection criteria
 
+Explain why you chose the models you did. The selection spans a range of parameter counts and a simple binary range of reasoning capabilities, which is deliberate -- you want both axes to vary so you can disentangle their effects. Mention that all models are available through Ollama and run locally, which keeps the hardware environment constant.
+
+% = PARAGRAPH 3 = The reasoning capability variable
+
+Introduce reasoning capability as an explicit experimental variable, distinct from parameter count. Flag the key constrast: codestral:22b has the most parameters but lacks native reasoning, while smaller reasoning models outperform it. This is not a post-hoc observation -- it was an emerging finding from initial testing that shaped the final model selection. Present a model summary table here (model name, parameter count, reasoning: yes/no, quantisation -> always no for us).
+
+% = PARAGRAPH 4 = Iteration count as a variable
+
+Explain that the maximum iteration count is itself a parameter of interest. You run each (model, prompt, condition) combination up to the maximum, recording when convergence occurs. This lets you analyse diminishing returns and determine the practical cut-off beyond which additional iterations yield negligible improvements -- which feeds directly into the cost-quality tradeoff in RQ2.
 
 \subsection{Validation Strategy}
 
-This is the most critical methodological section. Address the supervisor's concern directly: can the W3C validator actually detect semantic misuse of <div>? If it cannot (likely the case — W3C validates syntax, not semantics), you need to be transparent about this limitation and introduce a complementary evaluation. Options to discuss:
+% This is the most critical methodological section. Address the supervisor's concern directly: can the W3C validator actually detect semantic misuse of <div>? If it cannot (likely the case — W3C validates syntax, not semantics), you need to be transparent about this limitation and introduce a complementary evaluation. Options to discuss:
 
-\begin{itemize}
-	\item A human evaluation rubric (e.g. annotators scoring semantic correctness)
-	\item A secondary automated check (e.g. counting occurrences of semantic tags vs. <div> before and after)
-	\item Possibly a separate LLM-as-judge evaluation
-\end{itemize}
+% \begin{itemize}
+% 	\item A human evaluation rubric (e.g. annotators scoring semantic correctness)
+% 	\item A secondary automated check (e.g. counting occurrences of semantic tags vs. <div> before and after)
+% 	\item Possibly a separate LLM-as-judge evaluation
+% \end{itemize}
 
-Clarify what "comparable output quality" means for RQ2 — define your quality metric explicitly.
+% Clarify what "comparable output quality" means for RQ2 — define your quality metric explicitly.
 
-\textbf{Change}: Add a subsection on the blind ablation control. This is a significant addition — for each run, the pipeline now runs both a \verb|feedback| condition (model sees validator errors) and a \verb|blind| condition (model is only told to "review and fix"). This lets you isolate how much improvement comes from the validator feedback itself versus simply giving the model a second attempt. This is important to call out as a deliberate design choice.
+% \textbf{Change}: Add a subsection on the blind ablation control. This is a significant addition — for each run, the pipeline now runs both a \verb|feedback| condition (model sees validator errors) and a \verb|blind| condition (model is only told to "review and fix"). This lets you isolate how much improvement comes from the validator feedback itself versus simply giving the model a second attempt. This is important to call out as a deliberate design choice.
 
-Also add: \verb|check_validator_determinism.py| is used to verify the W3C validator itself is stable before trusting any before/after deltas, worth mentioning as a validity check.
+% Also add: \verb|check_validator_determinism.py| is used to verify the W3C validator itself is stable before trusting any before/after deltas, worth mentioning as a validity check.
+
+% = PARAGRAPH 1 = What the W3C validator measures
+
+Be transparent upfront: the W3C Markup Validation Service checks structural and syntactic conformance to the HTML specification. It does not evaluate semantic intent -- it cannot tell you that \verb|<div class="nav">| is worse than \verb|<nav>|. State this limitation clearly, because it is the central methodological tension of your study.
+
+% = PARAGRAPH 2 = What does it capture and why it's still useful
+
+Despite this, the validator is a meaningful signal. Many divitis-related errors manifest as structural issues (missing landmark elements, improper nesting, attribute misuse) that the validator does flag. Argue that error/warning count reduction is a necessary but not sufficient proxy for semantic improvement -- useful, but it must be triangulated with other measures.
+
+% = PARAGRAPH 3 = Blind ablation control
+
+Introduce the blind condition as a deliberate experimental control. For every (model, prompt) pair, the pipeline runs two conditions in parallel: the \verb|feedback| condition (the model receives the validator's specific error list) and the \verb|blind| condition (the model is simply told to review and improve its output, with no error details). The difference in outcomes between these conditions isolates the contribution of the validator feedback itself, distinguishing it from the general benefit of giving a model a second attempt.
+
+% = PARAGRAPH 5 = Validator determinism check
+
+Explain the role of \verb|check_validator_determinism.py|. Before trusting any before/after deltas, you verify that the validator produces identical results when run on the same HTML input multiple times. This is a non-trivial validity check -- if the validator were stochastic, your improvement metrics would be meaningless. State the result of this check (presumably: the validator is deterministic).
 
 
 
 \subsection{Cost Metric}
 
-Define how you operationalise "cost" — API pricing per token, latency, or total tokens consumed per run. This addresses the supervisor's question about RQ2's cost dimension.
+% Define how you operationalise "cost" — API pricing per token, latency, or total tokens consumed per run. This addresses the supervisor's question about RQ2's cost dimension.
 
-\textbf{Change}: Clarify that cost is proxied via generation latency and token counts (not API pricing), since all models run locally through Ollama. The results schema captures \verb|gen_time_s|, \verb|prompt_eval_count|, and \verb|eval_count| per iteration. Note explicitly that no cloud/API-based model baseline is included in this pipeline (as stated in the repo's Scope section) — this is a scope limitation to acknowledge.
+% \textbf{Change}: Clarify that cost is proxied via generation latency and token counts (not API pricing), since all models run locally through Ollama. The results schema captures \verb|gen_time_s|, \verb|prompt_eval_count|, and \verb|eval_count| per iteration. Note explicitly that no cloud/API-based model baseline is included in this pipeline (as stated in the repo's Scope section) — this is a scope limitation to acknowledge.
+
+% = PARAGRAPH 1 = Operationalising cost locally
+
+Explain that since all moedls run locally via Ollama, there is no API pricing to measure. Instead, cost is proxied through three values captured per iteration: \verb|gen_time_s| (wall-clock generation time), \verb|prompt_eval_count| (tokens in the prompt), and \verb|eval_count| (tokens generated). These together give a picture of both time cost and computational load per run.
+
+% = PARAGRAPH 2 = Scope limitation: no cloud baseline
+
+Acknowledge explicitly that no cloud-hosted large model (e.g. GPT-4o, Claude) is included in this study. The comparison is therefore entirely within the local model ecosystem. State this as a deliberate scope boundary -- cloud API costs introduce pricing variables outside your control -- and note it as a direction for future work. This is an honest limitation rather than a flaw, as long as it is named.
+
+
+
+
+
+
+
