@@ -1,37 +1,77 @@
-\subsection{RQ1 \textemdash{} Guardrail Effectiveness}
-
-% Report error/warning counts before and after the guardrail, per model and per prompt. Show whether the guardrail improves semantic correctness — and be careful to distinguish between W3C validation errors and semantic correctness (flag this distinction explicitly here).
-
-% \textbf{Change}: Results now need to be broken down by condition (\verb|feedback| vs \verb|blind|) as well as by model and difficulty tier, not just before/after. The statistical analysis uses paired Wilcoxon tests and 95\% confidence intervals, which should be stated. Also add error category breakdown as a dimension (missing-doctype, stray-tag, disallowed-attribute, etc.).
+\subsection{Guardrail Effectiveness}
 
 % = PARAGRAPH 1 = Measurement caveat upfront
 
-Before presenting any numbers, restate the key distinction from Section 4.4: W3C error/warning counts are your primary metric, but they are a proxy for semantic correctness, not a direct measure of it. Flag this explicitly here so the reader interprets what follows with the right expectations. One short paragraph, load-bearing for the integrity of the section.
+The error counts reported here are derived from the validator's output, which is a proxy for semantic correctness rather than a direct measure of it. As previously mentioned, while the validator provides a useful automated assessment of HTML validity, it may not capture all aspects of semantic correctness. We report error and warning counts as our primary metrics, but the results should be interpreted with this caveat in mind.
+
+\subsubsection{Overall before/after results (feedback condition)}
 
 % = PARAGRAPH 2 = Overall before/after results (feedback condition)
 
-Present the aggregate picture first: total error and warning counts before and after the guardraila cross all models and all 51 prompts, in the \verb|feedback| condition. Introduce your primary summary table here (errors before/after, warnings before/after, delta, percentage reduction). State the result of the paired Wilcoxon test and 95\% confidence interval -- does the guardrail produce a statistically significant reduction in errors?
+Overall, across all models and prompts in the feedback condition ($n=553$ runs), we observed a significant reduction in both errors and warnings after applying the guardrail. The aggregate results are summarized in Table~\ref{tab:rq1-aggregate}. The mean error count decreased from 17.16 to 4.07, representing a 76.3\% reduction, while the mean warning count decreased from 6.00 to 1.49, representing a 75.2\% reduction. Paired Wilcoxon signed-rank tests confirmed that these reductions were statistically significant ($p < 0.001$), with 95\% confidence intervals indicating meaningful decreases in both metrics.
 
-% Primary summary table: see tables.tex, Table~\ref{tab:rq1-aggregate} (tab:rq1-aggregate).
-% Per-model breakdown (supplementary to the aggregate number above):
-\begin{figure}[H]
+\begin{table}[H]
 	\centering
-	\includegraphics[width=\linewidth]{images/final_summary_errors.png}
-	\caption{Mean final error count (95\% CI) by model and condition (initial / feedback / blind). Value and $n$ are annotated above each bar since several models converge to exactly zero.}
-	\label{fig:final-summary-errors}
-\end{figure}
+	\caption{Aggregate before/after comparison}
+	\label{tab:rq1-aggregate}
+	\begin{tabular}{lccccccc}
+		\toprule
+		Metric   & Mean before & Mean after & $\Delta$ & \% reduction & $p$      & 95\% CI ($\Delta$) \\
+		\midrule
+		Errors   & 17.16       & 4.07       & 13.10    & 76.3\%       & $<0.001$ & [4.16, 22.03]      \\
+		Warnings & 6.00        & 1.49       & 4.51     & 75.2\%       & $<0.001$ & [0.01, 9.02]       \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+
+\subsubsection{Feedback vs. Blind Ablation}
 
 % = PARAGRAPH 3 = Feedback vs. blind condition
 
-Now introduce the ablation comparison. How does the \verb|feedback| condition compare to the \verb|blind| condition in terms of error reduction? This is the central validity argument for your guardrail design. If the \verb|feedback| condition significantly outperforms \verb|blind|, it means the validator's specific error list is doing real work, not just the act of reprompting. Present this as a table or figure comparing mean error reduction across both conditions, with statistical test results. I think I can split this up by difficulty of the prompt, for reasoning and non-reasoning models combined (2 categories) -> so 2 columns and 6 rows.
+% Now introduce the ablation comparison. How does the \verb|feedback| condition compare to the \verb|blind| condition in terms of error reduction? This is the central validity argument for your guardrail design. If the \verb|feedback| condition significantly outperforms \verb|blind|, it means the validator's specific error list is doing real work, not just the act of reprompting. Present this as a table or figure comparing mean error reduction across both conditions, with statistical test results. I think I can split this up by difficulty of the prompt, for reasoning and non-reasoning models combined (2 categories) -> so 2 columns and 6 rows.
+
+In Table~\ref{tab:rq1-feedback-vs-blind-reasoning}, we present the mean error reduction (before $-$ after) by prompt difficulty tier and condition, split by whether the model has a native reasoning/thinking mode. Higher values indicate more errors were resolved. Notably, in each difficulty tier, the feedback condition consistently outperforms the blind condition for both reasoning and non-reasoning models. This suggests that the validator's specific error list is indeed contributing to meaningful improvements in code generation quality, beyond just reprompting.
+
 
 % Difficulty x reasoning-category ablation table: see tables.tex, Table~\ref{tab:rq1-feedback-vs-blind-reasoning} (tab:rq1-feedback-vs-blind-reasoning).
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ll cc}
+		\toprule
+		Difficulty & Condition & Reasoning models & Non-reasoning models \\
+		\midrule
+		Simple     & Feedback  & 0.33 (n=30)      & 0.18 (n=67)          \\
+		Simple     & Blind     & 0.13 (n=30)      & -0.21 (n=67)         \\
+		\addlinespace
+		Medium     & Feedback  & 0.55 (n=73)      & 0.38 (n=141)         \\
+		Medium     & Blind     & 0.14 (n=73)      & -0.27 (n=141)        \\
+		\addlinespace
+		Difficult  & Feedback  & 1.86 (n=28)      & -0.10 (n=61)         \\
+		Difficult  & Blind     & -1.25 (n=28)     & -0.46 (n=61)         \\
+		\bottomrule
+	\end{tabular}
+	\vspace{0.5em}
+	\caption{Mean error reduction (before $-$ after)}
+	\label{tab:rq1-feedback-vs-blind-reasoning}
+\end{table}
+
+Across all difficulty tiers, the feedback condition shows a clear advantage over the blind condition, particularly for reasoning models. For example, in the difficult tier, reasoning models in the feedback condition resolved an average of 1.86 errors, while those in the blind condition actually saw an increase in errors (-1.25). Across simple and medium tiers, the blind condition does not result in an increase in errors, but it still underperforms the feedback condition. This suggests that the specific feedback provided by the validator is useful for guiding the model towards more correct code generation, especially for models with reasoning capabilities.
+
+
+% !!!!!!!!! DONE UNTIL HERE
+
+
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{images/trajectory_errors.png}
 	\caption{Mean error count per reprompt iteration, one line per model, feedback vs blind condition (shaded band = $\pm 1$ SEM; symlog $y$-axis since per-model means span roughly 0--60 errors). Feedback and blind start from the same iteration-0 (initial) generation.}
 	\label{fig:trajectory-errors}
 \end{figure}
+
+
 
 % = PARAGRAPH 4 = Breakdown by difficulty tier
 
@@ -47,6 +87,28 @@ Discuss whether error reduction varies across simple / medium / difficult prompt
 % = PARAGRAPH 5 = Error category breakdown
 
 Discuss which error types the guardrail is most and least effective at resolving. For example: does it reliably fix missing-doctype errors? Does it struggle with disallowed-attribute errors? This dimension answers the qualitative question of what the guardrail actually corrects, and is important for contextualising the aggregate numbers. A small frequency table of error categories (before vs. after) serves this paragraph well. I think I can retrieve this data from the json files in validation/reprompt/, not sure though?
+
+\begin{table}[H]
+	\centering
+	\caption{Frequency of each W3C validator message category before (initial generation) and after (final feedback-condition iteration), across all models and runs. Categories are drawn from \texttt{util.validation.categorize\_error} and combine both error- and warning-level messages; ``other'' is the uncategorised catch-all. Sorted by pre-reprompt frequency.}
+	\label{tab:rq1-error-categories}
+	\begin{tabular}{lcccc}
+		\toprule
+		Category             & Before & After & $\Delta$ & \% resolved \\
+		\midrule
+		other                & 11369  & 2619  & 8750     & 77.0\%      \\
+		disallowed-attribute & 697    & 28    & 669      & 96.0\%      \\
+		stray-tag            & 324    & 100   & 224      & 69.1\%      \\
+		disallowed-child     & 314    & 225   & 89       & 28.3\%      \\
+		missing-title        & 61     & 32    & 29       & 47.5\%      \\
+		missing-doctype      & 18     & 29    & -11      & -61.1\%     \\
+		duplicate-tag        & 14     & 13    & 1        & 7.1\%       \\
+		cannot-recover       & 10     & 11    & -1       & -10.0\%     \\
+		missing-attribute    & 5      & 3     & 2        & 40.0\%      \\
+		missing-lang         & 0      & 1     & -1       & ---         \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
 % Answer: the raw per-run validator JSON files aren't checked into the repo (only results/experiments.csv is), but experiments.csv already carries a pre-computed error_categories column per run (from util.validation.categorize_messages), so no JSON parsing is needed -- see analysis.stats.error_category_before_after.
 % Error category breakdown table: see tables.tex, Table~\ref{tab:rq1-error-categories} (tab:rq1-error-categories). Note it combines error- and warning-level messages (categorize_messages runs over both), not errors alone -- worth flagging given \S4.4's error/warning distinction.
@@ -95,6 +157,30 @@ Give this finding its own paragraph because it is the most interesting and surpr
 
 Does the \verb|feedback| condition cost more than \verb|blind| in token terms? It should, since it passes longer prompts (original code + error list). Is the extra cost justified by the quality gain? Frame this as a cost-benefit ratio: additional tokens spent per additional error resolved.
 
+% Wrapped in \resizebox since this table is wide (6 columns) -- confirmed it
+% overflows a single-column page width otherwise (tested standalone).
+\begin{table}[H]
+	\centering
+	\caption{Mean total tokens per run (initial generation plus all reprompt iterations) under feedback vs blind, per model. ``Extra tokens'' is feedback minus blind; ``extra resolved'' is the mean additional errors resolved by feedback over blind (positive = feedback resolves more). The last column is tokens spent per additional error resolved, only defined where feedback resolves strictly more errors than blind.}
+	\label{tab:rq2-token-cost}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{lccccc}
+			\toprule
+			Model                        & Mean feedback tokens & Mean blind tokens & Extra tokens (feedback $-$ blind) & Extra errors resolved & Tokens / extra resolved \\
+			\midrule
+			\textbf{All models (pooled)} & 9710                 & 11293             & -1584 (-14.0\%)                   & -0.049                & ---                     \\
+			codestral:22b                & 1356                 & 1998              & -642 (-32.1\%)                    & +0.333                & -1925.4                 \\
+			deepseek-coder:6.7b          & 2703                 & 3083              & -380 (-12.3\%)                    & +0.925                & -410.6                  \\
+			gemma3:1b                    & 2999                 & 2528              & +470 (+18.6\%)                    & +0.132                & 3573.8                  \\
+			gemma4:e4b                   & 8625                 & 9172              & -547 (-6.0\%)                     & +3.100                & -176.5                  \\
+			qwen2.5-coder:14b            & 3166                 & 3855              & -689 (-17.9\%)                    & +0.545                & -1262.8                 \\
+			qwen3:4b-thinking            & 6538                 & 15584             & -9046 (-58.0\%)                   & +0.297                & -30455.0                \\
+			smollm2:135m                 & 24292                & 23839             & +453 (+1.9\%)                     & -1.895                & ---                     \\
+			\bottomrule
+		\end{tabular}%
+	}
+\end{table}
+
 % Answer worth checking before writing this paragraph: per analysis.stats.token_cost_comparison, feedback is actually CHEAPER than blind in total tokens per run for 5 of 7 models (and pooled across all models) -- not more expensive as assumed above. This is because blind converges more slowly (more reprompt iterations needed on average, each carrying its own token cost), so even though each individual feedback iteration's prompt is longer (original code + specific error list), feedback needs fewer of them. Confirm this holds before writing the "it should cost more" framing as-is.
 % Cost-benefit table: see tables.tex, Table~\ref{tab:rq2-token-cost} (tab:rq2-token-cost).
 
@@ -120,5 +206,30 @@ Using the output of \verb|stats.py|'s iteration-cutoff analysis, describe when m
 % = PARAGRAPH 2 = Dimishing returns and the optimal cut-off
 
 Identify where the marginal gain per additional iteration drops below a meaningful threshold. If, for example, 80\% of resolvable errors are fixed by iteration 2 and iterations 3-5 contribute minimally, that is your practical recommendation for the maximum iteration count. State this as a concrete finding rather than a vague observation. Note whether this threshold differs by model or difficulty tier.
+
+\begin{table}[H]
+	\centering
+	\caption{For each iteration cap, the percentage of feedback-condition runs already fully resolved (zero errors) and the mean remaining error count at that cutoff, by prompt difficulty tier. The per-model equivalent is available via \texttt{analysis.stats.iteration\_cutoff\_analysis(..., group\_by="model")}.}
+	\label{tab:iteration-cutoff-difficulty}
+	\begin{tabular}{lcccc}
+		\toprule
+		Difficulty & Iteration cutoff & \% resolved & Mean remaining & $n$ runs \\
+		\midrule
+		Simple     & 0                & 57.4\%      & 0.97           & 136      \\
+		Simple     & 1                & 67.6\%      & 11.44          & 136      \\
+		Simple     & 2                & 70.6\%      & 0.80           & 136      \\
+		Simple     & 3                & 70.6\%      & 0.80           & 136      \\
+		Medium     & 0                & 50.8\%      & 20.76          & 295      \\
+		Medium     & 1                & 61.7\%      & 14.88          & 295      \\
+		Medium     & 2                & 70.5\%      & 9.85           & 295      \\
+		Medium     & 3                & 70.8\%      & 5.24           & 295      \\
+		Difficult  & 0                & 49.2\%      & 26.52          & 122      \\
+		Difficult  & 1                & 62.3\%      & 13.47          & 122      \\
+		Difficult  & 2                & 66.4\%      & 2.43           & 122      \\
+		Difficult  & 3                & 66.4\%      & 4.87           & 122      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
 
 % Cutoff-by-difficulty table: see tables.tex, Table~\ref{tab:iteration-cutoff-difficulty} (tab:iteration-cutoff-difficulty). Per-model cutoff table is the same function with group_by="model" (not pre-generated into tables.tex since it has one row per model per cutoff -- regenerate via analysis.stats.iteration_cutoff_analysis if you want it tabulated too).
