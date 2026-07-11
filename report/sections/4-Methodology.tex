@@ -4,15 +4,33 @@
 
 % = PARAGRAPH 1 = Overview of the three components
 
-Introduce the three pillars of the system: the LLM (served locally via Ollama), the 'Nu Html Checker (vnu)' service (hosted in Docker~\footnote{ghcr.io/validator/validator:latest}), and the Python orchestration pipeline. Explain that these are deliberately kept modular -- the LLM and validator are interchangable without rewriting the pipeline. This modularity is a design choice worth stating explicitly. Mention that we will refer to the validator as 'the validator'.
+% Introduce the three pillars of the system: the LLM (served locally via Ollama), the 'Nu Html Checker (vnu)' service (hosted in Docker~\footnote{ghcr.io/validator/validator:latest}), and the Python orchestration pipeline. Explain that these are deliberately kept modular -- the LLM and validator are interchangable without rewriting the pipeline. This modularity is a design choice worth stating explicitly. Mention that we will refer to the validator as 'the validator'.
 
-% = PARAGRAPH 2 = The feedback loop, step by step
+The system consists of three key components. First, we have the language models themselves, which are served locally and ran via Ollama. The second and most important component, the validator, is the Nu Html Checker (vnu) service. This service is available via a public API and also, conveniently, as a Docker container~\footnote{ghcr.io/validator/validator:latest}. Finally, the third component is the Python pipeline that handles the connection between the LLM and the validator.
 
-Walk through one full iteration of the loop: prompt -> LLM generates HTML -> validator checks it -> if errors exist and the iteration limit is not reached -> reprompt with original code + error list -> repeat. Reference your flowchart figure here. Keep it process-focused, not implementation-focused.
+% = PARAGRAPH 2 = Design choice: Docker over public W3C API
 
-% = PARAGRAPH 3 = Design choice: Docker over public W3C API
+% Justify why you run the validator locally in Docker rather than hitting the public API. Two reasons: avoiding rate limits during large-scale batch runs across 51 prompts x multiple models x multiple conditions, and ensuring the validator version is pinned and consistent across all runs. The latter matters for reproducibility.
 
-Justify why you run the validator locally in Docker rather than hitting the public API. Two reasons: avoiding rate limits during large-scale batch runs across 51 prompts x multiple models x multiple conditions, and ensuring the validator version is pinned and consistent across all runs. The latter matters for reproducibility.
+Each of these components is its own distinct module. This modularity is a deliberate design choice, allowing for the LLM and validator to be swapped out without needing to rewrite the pipeline. We run the validator locally in Docker rather than using the public API for two reasons. First, the public API has rate limits that would make large-scale batch runs across 51 prompts, multiple models, and multiple conditions impractical. Second, running the validator locally allows us to pin the version and ensure consistency across all runs. This is important to ensure reproducibility of our results.
+
+% = PARAGRAPH 3 = The feedback loop, step by step
+
+% Walk through one full iteration of the loop: prompt -> LLM generates HTML -> validator checks it -> if errors exist and the iteration limit is not reached -> reprompt with original code + error list -> repeat. Reference your flowchart figure here. Keep it process-focused, not implementation-focused.
+
+The pipeline, which is illustrated in Figure~\ref{fig:feedback-loop}, operates in a loop. First, the prompt is sent to the LLM, which generates the initial HTML code. This code is validated by the validator. If any issues are found, the pipeline reprompts the LLM with the original code and the list of issues. This loop continues until either the code passes validation or the maximum number of iterations is reached.
+
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\columnwidth]{images/Diagram_V2.drawio.pdf}
+	\caption{Overview of the iterative validation and regeneration loop.}
+	\label{fig:feedback-loop}
+\end{figure}
+
+
+
+
 
 \subsection{Prompt Dataset}
 
@@ -22,15 +40,24 @@ Justify why you run the validator locally in Docker rather than hitting the publ
 
 % = PARAGRAPH 1 = Construction rationale
 
-Explain that the prompt set was hand-crafted rather than sampled from an existing benchmark, because no established benchmark exists for HTML semantic quality specifically. The goal was to create tasks that structurally require semantic tags -- so that a model defaulting to \verb|<div>| produces objectively worse output. This justifies the custom dataset.
+% Explain that the prompt set was hand-crafted rather than sampled from an existing benchmark, because no established benchmark exists for HTML semantic quality specifically. The goal was to create tasks that structurally require semantic tags -- so that a model defaulting to \verb|<div>| produces objectively worse output. This justifies the custom dataset.
+
+The prompt dataset was hand-crafted rather than sampled from an existing benchmark, because no such benchmark exists for HTML semantic quality specifically. The goal was to create tasks that vary in difficulty structurally.
+
 
 % = PARAGRAPH 2 = The three difficulty tiers
 
-Describe the tiered structure: simple (single-component pages), medium (multi-section layouts), difficult (complex interactive or multi-role pages). Explain what makes a prompt "harder" -- more opportunities for semantic tags, more structural complexity, higher chance of divitis. Give one or two illustrative examples per tier without listing all 51.
+% Describe the tiered structure: simple (single-component pages), medium (multi-section layouts), difficult (complex interactive or multi-role pages). Explain what makes a prompt "harder" -- more opportunities for semantic tags, more structural complexity, higher chance of divitis. Give one or two illustrative examples per tier without listing all 51.
+
+We organise the prompts into a three-tiered structure: simple, medium, and difficult. The difficulty of a prompt is based on the structural complexity of the desired output. Simple prompts involve single components, such as a couple headers that contain some text. Medium prompts involve multi-section layouts, such as a navigation bar, a main content area, and a footer. Difficult prompts involve complex structures, such as the periodic table of elements, which requires a complex table layout with many containers to fit the name of the chemical element, its symbol, its atomic number, and other information. The more complex the structure, the more opportunities there are for the model to make a semantic error.
+
 
 % = PARAGRAPH 3 = Fixed ordering and comparability
 
-Explain that all models are evaluated on the exact same 51 prompts in the same order. This fixed design ensures that differences in results are attributable to the model or condition, not to prompt sampling variance. Constrast this briefly with a random-sampling approach and why you rejected it. (how I initially did it)
+% Explain that all models are evaluated on the exact same 51 prompts in the same order. This fixed design ensures that differences in results are attributable to the model or condition, not to prompt sampling variance. Constrast this briefly with a random-sampling approach and why you rejected it. (how I initially did it)
+
+All models are evaluated on the exact same 51 prompts in the same order. We opted for this fixed design to ensure that differences in results are attributable to the model or condition, rather than to prompt sampling variance.
+
 
 \subsection{Models \& Configurations}
 
@@ -40,7 +67,10 @@ Explain that all models are evaluated on the exact same 51 prompts in the same o
 
 % = PARAGRAPH 1 = Model selection criteria
 
-Explain why you chose the models you did. The selection spans a range of parameter counts and a simple binary range of reasoning capabilities, which is deliberate -- you want both axes to vary so you can disentangle their effects. Mention that all models are available through Ollama and run locally, which keeps the hardware environment constant.
+% Explain why you chose the models you did. The selection spans a range of parameter counts and a simple binary range of reasoning capabilities, which is deliberate -- you want both axes to vary so you can disentangle their effects. Mention that all models are available through Ollama and run locally, which keeps the hardware environment constant.
+
+We selected a range of models that vary in both parameter count and reasoning capability. Additionally, all models are available through Ollama and run locally, which keeps the hardware environment constant.
+
 
 % = PARAGRAPH 3 = The reasoning capability variable
 
