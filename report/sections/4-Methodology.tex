@@ -6,7 +6,7 @@
 
 % Introduce the three pillars of the system: the LLM (served locally via Ollama), the 'Nu Html Checker (vnu)' service (hosted in Docker~\footnote{ghcr.io/validator/validator:latest}), and the Python orchestration pipeline. Explain that these are deliberately kept modular -- the LLM and validator are interchangable without rewriting the pipeline. This modularity is a design choice worth stating explicitly. Mention that we will refer to the validator as 'the validator'.
 
-The system consists of three key components. First, we have the language models themselves, which are served locally and ran via Ollama. The second and most important component, the validator, is the Nu Html Checker (vnu) service. This service is available via a public API and also, conveniently, as a Docker container~\footnote{ghcr.io/validator/validator:latest}. Finally, the third component is the Python pipeline that handles the connection between the LLM and the validator.
+The system consists of three key components. First, we have the language models themselves, which are served locally and run via Ollama. The second and most important component, the validator, is the Nu Html Checker (vnu) service. This service is available via a public API and also, conveniently, as a Docker container~\footnote{ghcr.io/validator/validator:latest}. Finally, the third component is the Python pipeline that handles the connection between the LLM and the validator.
 
 % = PARAGRAPH 2 = Design choice: Docker over public W3C API
 

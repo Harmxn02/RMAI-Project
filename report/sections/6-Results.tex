@@ -219,7 +219,7 @@ The last column shows the number of tokens spent per additional error resolved, 
 
 \subsubsection{Diminishing Returns and Optimal Cut-off}
 
-% = PARAGRAPH 2 = Dimishing returns and the optimal cut-off
+% = PARAGRAPH 2 = Diminishing returns and the optimal cut-off
 
 
 The amount of issues resolved does not scale linearly with the number of iterations, as shown in Table~\ref{tab:iteration-cutoff-difficulty}. There is a clear diminishing return on the number of iterations, with the majority of resolvable errors being fixed within the first two iterations. For example, in the simple prompt tier, 70.6\% of runs have resolved all errors by iteration 2, and this does not increase at all by iteration 3. In the medium prompt tier, 70.5\% of runs have resolved all errors by iteration 2, and this only increases slightly to 70.8\% by iteration 3. In the difficult prompt tier, 62.3\% of runs have resolved all errors by the first iteration, and this only increases to 66.4\% with two additional iterations. This suggests that a practical recommendation for the maximum iteration count is 2, as additional iterations beyond this point yield minimal improvements in error resolution.
