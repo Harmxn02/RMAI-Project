@@ -1,7 +1,9 @@
-\begin{abstract}
-  The abstract paragraph should be indented \nicefrac{1}{2}~inch (3~picas) on
-  both the left- and right-hand margins. Use 10~point type, with a vertical
-  spacing (leading) of 11~points.  The word \textbf{Abstract} must be centered,
-  bold, and in point size 12. Two line spaces precede the abstract. The abstract
-  must be limited to one paragraph.
-\end{abstract}
+% \begin{abstract}
+%   The abstract paragraph should be indented \nicefrac{1}{2}~inch (3~picas) on
+%   both the left- and right-hand margins. Use 10~point type, with a vertical
+%   spacing (leading) of 11~points.  The word \textbf{Abstract} must be centered,
+%   bold, and in point size 12. Two line spaces precede the abstract. The abstract
+%   must be limited to one paragraph.
+% \end{abstract}
+
+Large language models are good at writing HTML that works, but not always HTML that is semantically correct. A common failure mode is `divitis': wrapping everything in \verb|<div>| tags instead of using semantic elements like \verb|<nav>| or \verb|<article>|, which makes pages harder to maintain and harder for screen readers to interpret. This report tests whether an iterative feedback loop, where an external validator flags structural errors and the model is reprompted with that feedback, can reduce structural errors in HTML output. We find that the feedback loop significantly reduces validation errors, with a 76.3\% mean error reduction in the feedback condition. Additionally, a blind ablation check confirms that this improvement is attributable to the validator's specific error feedback, not to reprompting alone. We also find that smaller models with native reasoning capability can match or exceed the output quality of models with far more parameters, and that the guardrail enables this parity without increasing token cost. Finally, we determine that a maximum of 2 reprompt iterations captures the majority of resolvable errors (99\% of converging runs do so by iteration 2), beyond which diminishing returns make further iterations wasteful.
