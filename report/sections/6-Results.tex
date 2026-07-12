@@ -127,16 +127,7 @@ Given that these experiments are conducted on local models, we define cost-effic
 
 % = PARAGRAPH 2 = Quality vs cost per model
 
-Figure~\ref{fig:model-size-vs-cost} shows a comparison between the total time a model took per run, and the amount of errors left after all iterations. Looking first at the models without a native thinking mode, we can see that there is a general trend between the amount of parameters and the mean total generation time per run. However, this increase in generation time does not translate to a better final error count (Figure~\ref{fig:cost-quality}). For example, \verb|deepseek-coder:6.7b| (6.7B parameters) achieves a lower mean final error count than \verb|qwen2.5-coder:14b| (14B parameters). This suggests that the parameter count alone is not a sufficient predictor of model performance in terms of error reduction.
-
-\begin{figure}[H]
-	\centering
-	\setlength{\fboxsep}{0pt}
-	\setlength{\fboxrule}{0.25pt}
-	\fbox{\includegraphics[width=0.95\linewidth]{images/model_size_vs_cost_errors.png}}
-	\caption{Parameter count vs mean total generation time per run, coloured by native thinking mode.}
-	\label{fig:model-size-vs-cost}
-\end{figure}
+Figure~\ref{fig:cost-quality} shows a comparison between the total time a model took per run, and the amount of errors left after all iterations. Looking first at the models without a native thinking mode, we can see that there is a general trend between the amount of parameters and the mean total generation time per run (Figure~\ref{fig:model-size-vs-cost}). However, this increase in generation time does not translate to a better final error count. For example, deepseek-coder:6.7b (6.7B parameters) achieves a lower mean final error count than qwen2.5-coder:14b (14B parameters). This suggests that the parameter count alone is not a sufficient predictor of model performance in terms of error reduction.
 
 \begin{figure}[H]
 	\centering
@@ -145,6 +136,15 @@ Figure~\ref{fig:model-size-vs-cost} shows a comparison between the total time a 
 	\fbox{\includegraphics[width=0.95\linewidth]{images/cost_quality_errors.png}}
 	\caption{Mean total generation time per run vs mean final error count (feedback condition)}
 	\label{fig:cost-quality}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\setlength{\fboxsep}{0pt}
+	\setlength{\fboxrule}{0.25pt}
+	\fbox{\includegraphics[width=0.95\linewidth]{images/model_size_vs_cost_errors.png}}
+	\caption{Parameter count vs mean total generation time per run, coloured by native thinking mode.}
+	\label{fig:model-size-vs-cost}
 \end{figure}
 
 \subsubsection{Reasoning vs. Non-Reasoning as the Decisive Variable}
@@ -247,6 +247,6 @@ The amount of issues resolved does not scale linearly with the number of iterati
 		\bottomrule
 	\end{tabular}
 	\vspace{1em}
-	\caption{Dimishing returns by prompt difficulty tier, showing the percentage of runs that have resolved all errors by each iteration cutoff, and the mean number of remaining errors for those that have not yet resolved.}
+	\caption{Diminishing returns by prompt difficulty tier, showing the percentage of runs that have resolved all errors by each iteration cutoff, and the mean number of remaining errors for those that have not yet resolved.}
 	\label{tab:iteration-cutoff-difficulty}
 \end{table}

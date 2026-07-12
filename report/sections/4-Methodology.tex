@@ -150,7 +150,7 @@ In addition to running the pipeline in the feedback condition, we also run it in
 
 % Explain the role of \verb|check_validator_determinism.py|. Before trusting any before/after deltas, you verify that the validator produces identical results when run on the same HTML input multiple times. This is a non-trivial validity check -- if the validator were stochastic, your improvement metrics would be meaningless. State the result of this check (presumably: the validator is deterministic).
 
-In related work where code quality was evaluated, the validator used was other LLMs, which struggle to provide deterministic outputs. To ensure that the validator is deterministic, we run a check on the same HTML input multiple times to verify that the validator produces identical results. This is non-trivial. If the validator were stochastic, our improvement metrics would be meaningless. We found that the validator is indeed deterministic, which gives us confidence in our before/after deltas.
+In related work where code quality was evaluated, other LLMs were the validator. We believe this to be an oversight because LLMs struggle to provide deterministic outputs. To ensure that the validator is deterministic, we run a check on the same HTML input multiple times to verify that the validator produces identical results. This is non-trivial. If the validator were stochastic, our improvement metrics would be meaningless. We found that the validator is indeed deterministic, which gives us confidence in our before/after deltas.
 
 
 
