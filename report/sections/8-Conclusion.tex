@@ -3,7 +3,7 @@
 
 The iterative feedback loop significantly reduces HTML validation errors, with a 76.3\% mean error reduction in the feedback condition. The blind ablation confirms that this improvement is attributable to the validator's specific error feedback, not to reprompting alone.
 
-Smaller models with native reasoning capability can match or exceed the output quality of models with far more parameters. The guardrail enables this parity, and does so without increasing token cost. For most models, the feedback condition is actually cheaper in total tokens than the vlind condition due to faster convergence.
+Smaller models with native reasoning capability can match or exceed the output quality of models with far more parameters. The guardrail enables this parity, and does so without increasing token cost. For most models, the feedback condition is actually cheaper in total tokens than the blind condition due to faster convergence.
 
 A maximum of 2 reprompt iterations captures the majority of resolvable errors (99\% of converging runs do so by iteration 2), beyond which diminishing returns make further iterations wasteful. A small reasoning-capable model under a feedback guardrail is a more cost-effective choice than a large non-reasoning model without one.
 
