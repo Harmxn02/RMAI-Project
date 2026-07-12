@@ -23,7 +23,9 @@ The pipeline, which is illustrated in Figure~\ref{fig:feedback-loop}, operates i
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\columnwidth]{images/Diagram_V2.drawio.pdf}
+	\setlength{\fboxsep}{0pt}
+	\setlength{\fboxrule}{0.25pt}
+	\fbox{\includegraphics[width=0.80\linewidth]{images/Diagram_V2.drawio.pdf}}
 	\caption{Overview of the iterative validation and regeneration loop.}
 	\label{fig:feedback-loop}
 \end{figure}
@@ -81,8 +83,6 @@ We selected a range of models that vary in both parameter count and reasoning ca
 
 \begin{table}[H]
 	\centering
-	\caption{Overview of all evaluated models}
-	\label{tab:model-summary}
 	\begin{tabular}{lccc}
 		\toprule
 		Model               & Parameters (B) & Reasoning \\
@@ -95,6 +95,9 @@ We selected a range of models that vary in both parameter count and reasoning ca
 		codestral:22b       & 22             & No        \\
 		\bottomrule
 	\end{tabular}
+	\vspace{0.5em}
+	\caption{Overview of all evaluated models}
+	\label{tab:model-summary}
 \end{table}
 
 % Model summary table: see tables.tex, Table~\ref{tab:model-summary} (tab:model-summary). Source: config/model_info.yaml in the LLM Validator submodule. Note smollm2:135m was also run (full data in results/experiments.csv) but has no model_info.yaml entry, so it's excluded from this table and from every reasoning/parameter-count-based analysis in the Results section -- worth a one-line mention if you want to account for all 7 models tested rather than just the 6 with confirmed reasoning-mode metadata.
