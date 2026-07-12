@@ -30,6 +30,12 @@
 
 
 
+% Appendix table setup
+\usepackage{longtable}
+\usepackage{booktabs}
+
+
+
 % ------------------------------
 %  Hyperlink and Citation Setup
 % ------------------------------
@@ -110,11 +116,13 @@ Harman Preet Singh \\[0.5em] 852863316 \\
 \label{sec:results}
 \input{sections/6-Results.tex}
 
-\section{Discussion (2 \textendash{} 3 pages)}
+\section{Discussion}
 \label{sec:discussion}
+\input{sections/7-Discussion.tex}
 
-\section{Conclusion (0.5 \textendash{} 1 page)}
+\section{Conclusion}
 \label{sec:conclusion}
+\input{sections/8-Conclusion.tex}
 
 
 
@@ -122,6 +130,7 @@ Harman Preet Singh \\[0.5em] 852863316 \\
 \bibliography{references}
 
 % (optional) APPENDIX
+\newpage
 \input{sections/Appendix.tex}
 
 
