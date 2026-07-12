@@ -1,18 +1,61 @@
 \subsection{Interpretation of Results}
-What do your findings mean for RQ1 and RQ2? Do smaller models with guardrails genuinely close the gap with larger models?
+% What do your findings mean for RQ1 and RQ2? Do smaller models with guardrails genuinely close the gap with larger models?
+
+% = PARAGRAPH 1 = RQ1 answer
+
+Through our experiment we can confidently state that the iterative feedback loop significantly improves HTML validity, with a 76.3\% reduction in mean errors and 75.2\% in warnings, which are both statistically significant (p < 0.001). The feedback condition consistently and meaningfully outperforms the blind condition across all difficulty tiers, confirming that the validator's specific error list is doing real work: it is not merely the act of reprompting, giving the model a second chance, that drives improvement.
+
+% = PARAGRAPH 2 = The blind condition as a cautionary finding
+
+The blind condition's behaviour noteworthy. For reasoning models on difficult prompts, the blind condition actively worsens output (mean error reduction of -1.25). Without the targeted feedback the validator provides, the reasoning model "overthinks" its revision and introduces new errors.
+
+% = PARAGRAPH 3 = RQ2 answer: reasoning capability over parameter count
+
+The decisive factor in closing the gap between smaller and larger models is not parameter count but reasoning capability. The \verb|qwen3:4b-thinking| model (4B parameters) achieves a lower mean final error count than \verb|codestral:22b| (22B parameters) and does so more cost-efficiently. This directly answers RQ2: smaller models can match or exceed larger ones, but only when they possess native reasoning capability, not simply because the guardrail gives them more attempts.
+
+% = PARAGRAPH 4 = The token cost inversion
+
+In Table~\ref{tab:rq2-token-cost}, we, counterintuitively, saw that the feedback condition is actually cheaper than the blind condition for 5 of 7 models in total token consumption, because it converges faster. The guardrail provides both a quality and cost advantage. However, the \verb|qwen3:4b-thinking| model stood out as an outlier. It spends \textasciitilde30,000 tokens per additional error resolved over the blind condition. This leads us to question whether the quality gain justifies the cost for reasoning models specifically.
+
+% = PARAGRAPH 5 = The simple prompt anomaly
+
+Surprisingly, we found that simple prompts end with higher mean final error counts than their starting error counts (visible in Figure~\ref{fig:difficulty-tier-errors}). This is because simple prompts produce short HTML outputs, so a single newly introduced error during reprompting has an outsized effect on the mean. This is an artefact of the metric rather than a genuine quality failure.
 
 \subsection{Validity of the Validation Approach}
-Honestly discuss the W3C validator's limitations as a proxy for semantic correctness. This is a known weakness in your design — better to own it and discuss it than to leave it unaddressed.
+% Honestly discuss the W3C validator's limitations as a proxy for semantic correctness. This is a known weakness in your design — better to own it and discuss it than to leave it unaddressed.
+
+% = PARAGRAPH 1 = The core limitation restated
+
+The validator measures syntactic and structural conformance, not semantic intent. A model that replaces every \verb|<div>| with another \verb|<div class="nav">| would pass the validator but solve nothing. Error reduction is therefore a necessary but not sufficient proxy for semantic correctness.
+
+% = PARAGRAPH 2 = What the validator does capture and why it still matters
+
+The validator does catch a meaningful class of structural errors that correlate with poor semantic quality even if they do not perfectly capture it. The 96\% resolution rate for disallowed-attribute errors and 69\% for stray-tag errors suggest the guardrail is correcting real, detectable problems.
+
+% = PARAGRAPH 3 = The msising semantic metric
+
+In the related work we introduced the Generic-to-Semantic Ratio (Rgs) and Heading Hierarchy Score (Hscore) as metrics for semantic correctness. These were not applied in this study's evaluation. Incorporating these metrics in future work would allow a more direct test of whether validator-driven error reduction actually translates to improved semantic structure.
 
 
 \subsection{Threats to Validity \& Risk Analysis}
-This directly addresses the supervisor's comment about missing risk analysis. Consider:
 
-\begin{itemize}
-	\item Prompt set bias (did you inadvertently design prompts that favour certain models?)
-	\item Rate limits or Docker instability
-	\item Model non-determinism
-	\item Whether results generalise beyond HTML to other languages/tasks
-\end{itemize}
+% = PARAGRAPH 1 = Prompt set bias
 
-\textbf{Change}: You now have a \verb|RISKS.md| in the repo — pull from that. Also, the validator determinism check (\verb|check_validator_determinism.py|) is a direct mitigation of one threat (validator noise), so mention it here as a risk that was actively addressed rather than just flagged.
+The prompt dataset was hand-crafted, which introduces the risk that prompts were inadvertently designed in ways that favour certain model architectures or output styles. Medium-difficulty prompts behaving more erratically than difficult ones (Figure~\ref{fig:difficulty-tier-errors}'s wider confidence intervals) may partly reflect this. The fixed 51-prompt ordering ensures all models face identical conditions, which limits within-experiment bias even if between-study generalisability is uncertain.
+
+% = PARAGRAPH 2 = Model non-determinism
+
+Even with a fixed seed and temperature setting, local model outputs are not guaranteed to be perfectly reproducible. We conducted repeated trials per (model, prompt, condition) combination to mitigate this, and the results were consistent across runs.
+
+% = PARAGRAPH 3 = Validator determinism (risk mitigated)
+
+We implemented a validator determinism check to ensure that the validator's output is consistent for the same HTML input. This was a non-trivial check, a stochastic validator would have made before/after deltas meaningless.
+
+% = PARAGRAPH 4 = Generalisability
+
+The findings are specific to HTML generation and locally available Ollama models. The core principle, which is that iterate validator feedback improved code quality and that reasoning capability matters more than parameter count, may generalise to other code generation contexts (SQL, Python, etc.) but this was not tested in this study. Future work should explore whether the same patterns hold for other programming languages and tasks. Additionally, the exclusion of cloud-based models (e.g., OpenAI, Anthropic) limits the applicability of the cost-efficiency findings, as these models have different pricing structures and performance characteristics.
+
+
+
+
+
